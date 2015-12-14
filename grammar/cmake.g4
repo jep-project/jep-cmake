@@ -13,77 +13,80 @@ compilation_unit
     ;
 
 file_element
-    : WS+
-    | LINE_COMMENT+
-    | command_invocation
+    : command_invocation
     ;
 
 
 command_invocation
-    : command=ID WS* '(' WS* (argument (WS+ argument)*)? WS* ')'
+    : command=IDENTIFIER grouped_arguments
+    ;
+
+grouped_arguments
+    : '(' argument* ')'
     ;
 
 argument
-    : STRING_LITERAL
-    | INTEGER_LITERAL
-    | .+?  // non-greedy, exit ASAP
+    : QUOTED_ARGUMENT
+    | UNQUOTED_ARGUMENT
+    | IDENTIFIER
+    | grouped_arguments
     ;
 
-
-
-STRING_LITERAL
-    : '"' ( ESCAPE_SEQUENCE | ~('\\' | '"') )* '"'
+IDENTIFIER
+    : ('A'..'Z' | 'a'..'z' | '_') ('A'..'Z' | 'a'..'z' | '0'..'9' | '_')*
     ;
 
-INTEGER_LITERAL
-    : ('0'..'9' '0'..'9'*)
+UNQUOTED_ARGUMENT
+    : UNQUOTED_ELEMENT+
     ;
 
-ID
-    : ID_FIRST_CHAR ID_NEXT_CHAR*
+fragment UNQUOTED_ELEMENT
+    : ~(' ' | '\t' | '\r' | '\n' | '(' | ')' | '#' | '"' | '\\')
+    | ESCAPE_SEQUENCE
     ;
 
-FILEPATH
-    : DRIVE_LETTER? SLASH? (
-          ('.' PATH_CHAR_NO_DOT PATH_CHAR*)
-        | ('..' PATH_CHAR+)
-        | (PATH_CHAR_NO_DOT PATH_CHAR*)
-      )
+QUOTED_ARGUMENT
+    : '"' QUOTED_ELEMENT* '"'
     ;
 
-LINE_COMMENT
-    : '#' ~[\n\r']* '\r'? ('\n'|'\r'|EOF)
+fragment QUOTED_ELEMENT
+    : ~('\\' | '"' | '\r' | '\n')
+    | ESCAPE_SEQUENCE
+    | QUOTED_CONTINUATION
     ;
 
-WS
-    : [ \t\n\r]+
+fragment QUOTED_CONTINUATION
+    : '\\' LINEEND
     ;
 
 fragment ESCAPE_SEQUENCE
-    : '\\' ('b' | 't' | 'n' | 'f' | 'r' | '\"' | '\'' | '\\')
+    : ESCAPE_IDENTITY | ESCAPE_ENCODED | ESCAPE_SEMICOLON
     ;
 
-fragment ID_FIRST_CHAR
-    : ('a'..'z'|'A'..'Z'|'_')
+fragment ESCAPE_IDENTITY
+    : '\\(' | '\\)' | '\\#' | '\\"' | '\\ ' | '\\\\' | '\\$' | '\\@' | '\\^'
     ;
 
-fragment ID_NEXT_CHAR
-    : (ID_FIRST_CHAR|'0'..'9')
+fragment ESCAPE_ENCODED
+    : '\\t' | '\\r' | '\\n'
     ;
 
-fragment PATH_CHAR_NO_DOT
-    : (ID_NEXT_CHAR|SLASH|'-')
+fragment ESCAPE_SEMICOLON
+    : '\\;'
     ;
 
-fragment PATH_CHAR
-    : (PATH_CHAR_NO_DOT|'.')
+SKIP
+    : (SPACES | LINEEND | COMMENT) -> skip
     ;
 
-fragment SLASH
-    : ('/'|'\\')
+fragment LINEEND
+    : '\r'? ('\n'|'\r'|EOF)
     ;
 
-fragment DRIVE_LETTER
-    : ('a'..'z'|'A'..'Z') ':'
+fragment SPACES
+    : [ \t]+
     ;
 
+fragment COMMENT
+    : '#' ~[\n\r']* LINEEND
+    ;
