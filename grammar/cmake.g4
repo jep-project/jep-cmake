@@ -13,29 +13,23 @@ compilation_unit
     ;
 
 file_element
-    : command_invocation
+    : WS+
+    | LINE_COMMENT+
+    | command_invocation
     ;
 
+
 command_invocation
-    : command=ID '(' argument* ')'
+    : command=ID WS* '(' WS* (argument (WS+ argument)*)? WS* ')'
     ;
 
 argument
-    : reference
-    | STRING_LITERAL
+    : STRING_LITERAL
     | INTEGER_LITERAL
-    | FILEPATH
-    | ID
+    | .+?  // non-greedy, exit ASAP
     ;
 
-reference
-    : '$' '(' reference_target_frag+ ')'
-    ;
 
-reference_target_frag
-    : ID
-    | reference INTEGER_LITERAL*
-    ;
 
 STRING_LITERAL
     : '"' ( ESCAPE_SEQUENCE | ~('\\' | '"') )* '"'
@@ -58,11 +52,11 @@ FILEPATH
     ;
 
 LINE_COMMENT
-    : '#' ~[\n\r']* '\r'? ('\n'|'\r'|EOF) -> skip
+    : '#' ~[\n\r']* '\r'? ('\n'|'\r'|EOF)
     ;
 
 WS
-    : [ \t\r\n]+ -> skip
+    : [ \t\n\r]+
     ;
 
 fragment ESCAPE_SEQUENCE
