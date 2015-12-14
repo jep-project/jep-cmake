@@ -4,7 +4,7 @@
  * Created from specification in https://cmake.org/cmake/help/v3.0/manual/cmake-language.7.html#syntax. Simplified to allow detection of command and variable definitions
  * supporting code completion via JEP.
  *
- * Missing: CMake 3+ support for new bracketed and quoted argument syntax forms.
+ * Missing: CMake 3+ support for new bracketed arguments and comments syntax.
  */
 grammar cmake;
 
