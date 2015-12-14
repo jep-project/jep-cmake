@@ -1,7 +1,8 @@
 T__0=1
 T__1=2
-T__2=3
-TEXT=4
-','=1
-'\r'=2
-'\n'=3
+IDENTIFIER=3
+UNQUOTED_ARGUMENT=4
+QUOTED_ARGUMENT=5
+SKIP=6
+'('=1
+')'=2
