@@ -8,39 +8,39 @@ else:
 # This class defines a complete listener for a parse tree produced by cmakeParser.
 class cmakeListener(ParseTreeListener):
 
-    # Enter a parse tree produced by cmakeParser#compilation_unit.
-    def enterCompilation_unit(self, ctx:cmakeParser.Compilation_unitContext):
+    # Enter a parse tree produced by cmakeParser#compilationUnit.
+    def enterCompilationUnit(self, ctx:cmakeParser.CompilationUnitContext):
         pass
 
-    # Exit a parse tree produced by cmakeParser#compilation_unit.
-    def exitCompilation_unit(self, ctx:cmakeParser.Compilation_unitContext):
-        pass
-
-
-    # Enter a parse tree produced by cmakeParser#file_element.
-    def enterFile_element(self, ctx:cmakeParser.File_elementContext):
-        pass
-
-    # Exit a parse tree produced by cmakeParser#file_element.
-    def exitFile_element(self, ctx:cmakeParser.File_elementContext):
+    # Exit a parse tree produced by cmakeParser#compilationUnit.
+    def exitCompilationUnit(self, ctx:cmakeParser.CompilationUnitContext):
         pass
 
 
-    # Enter a parse tree produced by cmakeParser#command_invocation.
-    def enterCommand_invocation(self, ctx:cmakeParser.Command_invocationContext):
+    # Enter a parse tree produced by cmakeParser#fileElement.
+    def enterFileElement(self, ctx:cmakeParser.FileElementContext):
         pass
 
-    # Exit a parse tree produced by cmakeParser#command_invocation.
-    def exitCommand_invocation(self, ctx:cmakeParser.Command_invocationContext):
+    # Exit a parse tree produced by cmakeParser#fileElement.
+    def exitFileElement(self, ctx:cmakeParser.FileElementContext):
         pass
 
 
-    # Enter a parse tree produced by cmakeParser#grouped_arguments.
-    def enterGrouped_arguments(self, ctx:cmakeParser.Grouped_argumentsContext):
+    # Enter a parse tree produced by cmakeParser#commandInvocation.
+    def enterCommandInvocation(self, ctx:cmakeParser.CommandInvocationContext):
         pass
 
-    # Exit a parse tree produced by cmakeParser#grouped_arguments.
-    def exitGrouped_arguments(self, ctx:cmakeParser.Grouped_argumentsContext):
+    # Exit a parse tree produced by cmakeParser#commandInvocation.
+    def exitCommandInvocation(self, ctx:cmakeParser.CommandInvocationContext):
+        pass
+
+
+    # Enter a parse tree produced by cmakeParser#groupedArguments.
+    def enterGroupedArguments(self, ctx:cmakeParser.GroupedArgumentsContext):
+        pass
+
+    # Exit a parse tree produced by cmakeParser#groupedArguments.
+    def exitGroupedArguments(self, ctx:cmakeParser.GroupedArgumentsContext):
         pass
 
 

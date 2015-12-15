@@ -37,14 +37,14 @@ class cmakeParser ( Parser ):
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "IDENTIFIER", 
                       "UNQUOTED_ARGUMENT", "QUOTED_ARGUMENT", "SKIP" ]
 
-    RULE_compilation_unit = 0
-    RULE_file_element = 1
-    RULE_command_invocation = 2
-    RULE_grouped_arguments = 3
+    RULE_compilationUnit = 0
+    RULE_fileElement = 1
+    RULE_commandInvocation = 2
+    RULE_groupedArguments = 3
     RULE_argument = 4
 
-    ruleNames =  [ "compilation_unit", "file_element", "command_invocation", 
-                   "grouped_arguments", "argument" ]
+    ruleNames =  [ "compilationUnit", "fileElement", "commandInvocation", 
+                   "groupedArguments", "argument" ]
 
     EOF = Token.EOF
     T__0=1
@@ -62,37 +62,37 @@ class cmakeParser ( Parser ):
 
 
 
-    class Compilation_unitContext(ParserRuleContext):
+    class CompilationUnitContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def file_element(self, i:int=None):
+        def fileElement(self, i:int=None):
             if i is None:
-                return self.getTypedRuleContexts(cmakeParser.File_elementContext)
+                return self.getTypedRuleContexts(cmakeParser.FileElementContext)
             else:
-                return self.getTypedRuleContext(cmakeParser.File_elementContext,i)
+                return self.getTypedRuleContext(cmakeParser.FileElementContext,i)
 
 
         def getRuleIndex(self):
-            return cmakeParser.RULE_compilation_unit
+            return cmakeParser.RULE_compilationUnit
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCompilation_unit" ):
-                listener.enterCompilation_unit(self)
+            if hasattr( listener, "enterCompilationUnit" ):
+                listener.enterCompilationUnit(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCompilation_unit" ):
-                listener.exitCompilation_unit(self)
+            if hasattr( listener, "exitCompilationUnit" ):
+                listener.exitCompilationUnit(self)
 
 
 
 
-    def compilation_unit(self):
+    def compilationUnit(self):
 
-        localctx = cmakeParser.Compilation_unitContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 0, self.RULE_compilation_unit)
+        localctx = cmakeParser.CompilationUnitContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 0, self.RULE_compilationUnit)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -101,7 +101,7 @@ class cmakeParser ( Parser ):
             _la = self._input.LA(1)
             while _la==cmakeParser.IDENTIFIER:
                 self.state = 10
-                self.file_element()
+                self.fileElement()
                 self.state = 15
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -114,38 +114,38 @@ class cmakeParser ( Parser ):
             self.exitRule()
         return localctx
 
-    class File_elementContext(ParserRuleContext):
+    class FileElementContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
 
-        def command_invocation(self):
-            return self.getTypedRuleContext(cmakeParser.Command_invocationContext,0)
+        def commandInvocation(self):
+            return self.getTypedRuleContext(cmakeParser.CommandInvocationContext,0)
 
 
         def getRuleIndex(self):
-            return cmakeParser.RULE_file_element
+            return cmakeParser.RULE_fileElement
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterFile_element" ):
-                listener.enterFile_element(self)
+            if hasattr( listener, "enterFileElement" ):
+                listener.enterFileElement(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitFile_element" ):
-                listener.exitFile_element(self)
+            if hasattr( listener, "exitFileElement" ):
+                listener.exitFileElement(self)
 
 
 
 
-    def file_element(self):
+    def fileElement(self):
 
-        localctx = cmakeParser.File_elementContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 2, self.RULE_file_element)
+        localctx = cmakeParser.FileElementContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 2, self.RULE_fileElement)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 16
-            self.command_invocation()
+            self.commandInvocation()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -154,44 +154,44 @@ class cmakeParser ( Parser ):
             self.exitRule()
         return localctx
 
-    class Command_invocationContext(ParserRuleContext):
+    class CommandInvocationContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.command = None # Token
 
-        def grouped_arguments(self):
-            return self.getTypedRuleContext(cmakeParser.Grouped_argumentsContext,0)
+        def groupedArguments(self):
+            return self.getTypedRuleContext(cmakeParser.GroupedArgumentsContext,0)
 
 
         def IDENTIFIER(self):
             return self.getToken(cmakeParser.IDENTIFIER, 0)
 
         def getRuleIndex(self):
-            return cmakeParser.RULE_command_invocation
+            return cmakeParser.RULE_commandInvocation
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterCommand_invocation" ):
-                listener.enterCommand_invocation(self)
+            if hasattr( listener, "enterCommandInvocation" ):
+                listener.enterCommandInvocation(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitCommand_invocation" ):
-                listener.exitCommand_invocation(self)
+            if hasattr( listener, "exitCommandInvocation" ):
+                listener.exitCommandInvocation(self)
 
 
 
 
-    def command_invocation(self):
+    def commandInvocation(self):
 
-        localctx = cmakeParser.Command_invocationContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 4, self.RULE_command_invocation)
+        localctx = cmakeParser.CommandInvocationContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 4, self.RULE_commandInvocation)
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 18
             localctx.command = self.match(cmakeParser.IDENTIFIER)
             self.state = 19
-            self.grouped_arguments()
+            self.groupedArguments()
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -200,7 +200,7 @@ class cmakeParser ( Parser ):
             self.exitRule()
         return localctx
 
-    class Grouped_argumentsContext(ParserRuleContext):
+    class GroupedArgumentsContext(ParserRuleContext):
 
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
@@ -214,23 +214,23 @@ class cmakeParser ( Parser ):
 
 
         def getRuleIndex(self):
-            return cmakeParser.RULE_grouped_arguments
+            return cmakeParser.RULE_groupedArguments
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterGrouped_arguments" ):
-                listener.enterGrouped_arguments(self)
+            if hasattr( listener, "enterGroupedArguments" ):
+                listener.enterGroupedArguments(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitGrouped_arguments" ):
-                listener.exitGrouped_arguments(self)
+            if hasattr( listener, "exitGroupedArguments" ):
+                listener.exitGroupedArguments(self)
 
 
 
 
-    def grouped_arguments(self):
+    def groupedArguments(self):
 
-        localctx = cmakeParser.Grouped_argumentsContext(self, self._ctx, self.state)
-        self.enterRule(localctx, 6, self.RULE_grouped_arguments)
+        localctx = cmakeParser.GroupedArgumentsContext(self, self._ctx, self.state)
+        self.enterRule(localctx, 6, self.RULE_groupedArguments)
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
@@ -271,8 +271,8 @@ class cmakeParser ( Parser ):
         def IDENTIFIER(self):
             return self.getToken(cmakeParser.IDENTIFIER, 0)
 
-        def grouped_arguments(self):
-            return self.getTypedRuleContext(cmakeParser.Grouped_argumentsContext,0)
+        def groupedArguments(self):
+            return self.getTypedRuleContext(cmakeParser.GroupedArgumentsContext,0)
 
 
         def getRuleIndex(self):
@@ -314,7 +314,7 @@ class cmakeParser ( Parser ):
             elif token in [cmakeParser.T__0]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 33
-                self.grouped_arguments()
+                self.groupedArguments()
 
             else:
                 raise NoViableAltException(self)

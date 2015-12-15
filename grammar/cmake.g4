@@ -8,20 +8,20 @@
  */
 grammar cmake;
 
-compilation_unit
-    : file_element*
+compilationUnit
+    : fileElement*
     ;
 
-file_element
-    : command_invocation
+fileElement
+    : commandInvocation
     ;
 
 
-command_invocation
-    : command=IDENTIFIER grouped_arguments
+commandInvocation
+    : command=IDENTIFIER groupedArguments
     ;
 
-grouped_arguments
+groupedArguments
     : '(' argument* ')'
     ;
 
@@ -29,7 +29,7 @@ argument
     : QUOTED_ARGUMENT
     | UNQUOTED_ARGUMENT
     | IDENTIFIER
-    | grouped_arguments
+    | groupedArguments
     ;
 
 IDENTIFIER
