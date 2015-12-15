@@ -14,8 +14,8 @@ macro(macro1)
     get_filename_component(absoluteTargetModelDirectory ${SOME_ARG} ABSOLUTE)
 endmacro()
 
-macro(macro2 arg1 arg2)
-endmacro()
+ macro(macro2 arg1 arg2)
+ endmacro()
 
 function(function1)
 endfunction()
@@ -27,3 +27,14 @@ macro1()
 macro2(A B)
 function1()
 function2(C D)
+
+
+# functions and macros in comments and strings must not be found!
+
+# function(functionBad1)
+# endfunction()
+
+set(var "\
+function(functionBad2) \
+endfunction() \
+")

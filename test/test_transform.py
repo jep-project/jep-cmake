@@ -22,6 +22,26 @@ def test_transformer_read_file():
     assert found_macro_names == {'macro1', 'macro2'}
     assert found_func_names == {'function1', 'function2'}
 
+    c = t.command_table['macro1']
+    assert c.line == 12
+    assert c.column == 7
+    assert c.length == 6
+
+    c = t.command_table['macro2']
+    assert c.line == 17
+    assert c.column == 8
+    assert c.length == 6
+
+    c = t.command_table['function1']
+    assert c.line == 20
+    assert c.column == 10
+    assert c.length == 9
+
+    c = t.command_table['function2']
+    assert c.line == 23
+    assert c.column == 10
+    assert c.length == 9
+
 
 def test_transformer_read_buffer():
     t = Transformer()

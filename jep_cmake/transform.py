@@ -18,6 +18,9 @@ class Transformer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         #: Compilation unit AST element built during last transformation.
         self.compilation_unit = None
 
+        #: Map of commands by name.
+        self.command_table = {}
+
         #: Map of CMake built-in commands to handler functions.
         self._command_handler = collections.defaultdict(lambda: self.enter_unhandled_command,
                                                         function=self.enter_function,
@@ -80,14 +83,17 @@ class Transformer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
     def enterArgument(self, ctx: cmakeParser.ArgumentContext):
         # for now only record first argument of command definitions:
         if self._current_command:
-            token = ctx.IDENTIFIER().symbol
-            self._current_command.name = token.text
-            self._current_command.line = token.line
-            self._current_command.column = token.column
-            self._current_command.length = 1 + token.stop - token.start
-            self._current_command.compilation_unit = self.compilation_unit
-            self.compilation_unit.fileelements.append(self._current_command)
-
-            _logger.debug('Found command definition {}.'.format(self._current_command))
-
+            command = self._current_command
             self._current_command = None
+
+            token = ctx.IDENTIFIER().symbol
+            command.name = token.text
+            command.line = token.line
+            command.column = 1 + token.column
+            command.length = 1 + token.stop - token.start
+            command.compilation_unit = self.compilation_unit
+            self.compilation_unit.fileelements.append(command)
+
+            _logger.debug('Found command definition {}.'.format(command))
+
+            self.command_table[command.name] = command
