@@ -80,7 +80,14 @@ class Transformer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
     def enterArgument(self, ctx: cmakeParser.ArgumentContext):
         # for now only record first argument of command definitions:
         if self._current_command:
-            self._current_command.name = ctx.IDENTIFIER().getText()
-            _logger.debug('Found command definition {}.'.format(self._current_command))
+            token = ctx.IDENTIFIER().symbol
+            self._current_command.name = token.text
+            self._current_command.line = token.line
+            self._current_command.column = token.column
+            self._current_command.length = 1 + token.stop - token.start
+            self._current_command.compilation_unit = self.compilation_unit
             self.compilation_unit.fileelements.append(self._current_command)
+
+            _logger.debug('Found command definition {}.'.format(self._current_command))
+
             self._current_command = None
