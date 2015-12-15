@@ -88,5 +88,5 @@ fragment SPACES
     ;
 
 fragment COMMENT
-    : '#' ~[\n\r']* LINEEND
+    : '#' ~[\n\r]* LINEEND
     ;
