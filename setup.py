@@ -29,7 +29,7 @@ def main():
     # configure dependencies corresponding to interpreter version:
     install_requires = [
         'antlr4-python3-runtime',
-        'u-msgpack-python',
+        'jep-python'
     ]
 
     if sys.version_info < (3, 3):

@@ -22,9 +22,13 @@ improve their CMake editing support beyong pure syntax highlighting.
 
 ## Installation
 
-From a Python 3.3+ environment install package from Github (will be uploaded to PyPI when more mature):
+Since the tool and associated libraries are under development, installation is only partly available via PyPI packages. In the meantime
+follow this script to install the `jep-cmake` in you local Python (or virtual) environment:
 
-    > pip install https://github.com/jep-project/jep-cmake/archive/master.zip
+    > git clone https://github.com/jep-project/jep-cmake.git
+    > cd jep-cmake
+    > pip install -r requirements.txt
+    > pip install .
     
 After installation, the Python environment has a new command `jep-cmake`, that will run the backend.
 
