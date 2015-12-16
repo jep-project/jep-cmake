@@ -37,22 +37,22 @@ def main():
         sys.exit(1)
     if sys.version_info < (3, 4):
         install_requires.append('enum34')
-setup(
-        name='jep-cmake',
-        version='0.0.1',
-        packages=find_packages(),
-        install_requires=install_requires,
-        tests_require=[
-            'pytest'
-        ],
-        cmdclass={'test': PyTestCommand},
-        url='https://github.com/jep-project/jep-cmake',
-        license='',
-        author='Mike Pagel',
-        author_email='mike@mpagel.de',
-        description='CMake backend for JEP-enabled editors, see http://joint-editors.org/.'
-)
 
+    setup(
+            name='jep-cmake',
+            version='0.0.1',
+            packages=find_packages(),
+            install_requires=install_requires,
+            tests_require=[
+                'pytest'
+            ],
+            cmdclass={'test': PyTestCommand},
+            url='https://github.com/jep-project/jep-cmake',
+            license='',
+            author='Mike Pagel',
+            author_email='mike@mpagel.de',
+            description='CMake backend for JEP-enabled editors, see http://joint-editors.org/.'
+    )
 
 
 if __name__ == '__main__':
