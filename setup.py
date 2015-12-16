@@ -42,6 +42,7 @@ def main():
             name='jep-cmake',
             version='0.0.1',
             packages=find_packages(),
+            entry_points={'console_scripts': ['jep-cmake = jep_cmake.main:main']},
             install_requires=install_requires,
             tests_require=[
                 'pytest'

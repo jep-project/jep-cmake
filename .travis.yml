@@ -12,3 +12,4 @@ install:
   - pip list
 script:
   - python setup.py test
+  - jep-cmake -h
