@@ -1,0 +1,14 @@
+language: python
+python:
+  - "3.3"
+  - "3.4"
+  - "3.5"
+install:
+  - pip install --upgrade pip
+  - pip install virtualenv
+  - virtualenv ~/jepvenv
+  - source ~/jepvenv/bin/activate
+  - pip install -e .
+  - pip list
+script:
+  - python setup.py test
