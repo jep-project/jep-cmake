@@ -1,4 +1,4 @@
-# jep-cmake [![Build Status](https://travis-ci.org/jep-project/jep_cmake.svg?branch=master)](https://travis-ci.org/jep-project/jep_cmake)
+# jep-cmake [![Build Status](https://travis-ci.org/jep-project/jep-cmake.svg)](https://travis-ci.org/jep-project/jep-cmake)
 
 JEP-based CMake support in the making.
 
@@ -37,4 +37,4 @@ contains CMake files should be enough:
     *.cmake,CMakeLists.txt:
     jep-cmake
 
-Currently `jep-cmake` does not yet take any command line arguments.
+Currently `jep-cmake` does not take any command line arguments.
