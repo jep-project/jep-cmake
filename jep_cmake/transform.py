@@ -1,5 +1,6 @@
 """Transformation of parse tree to AST."""
 import logging
+import os
 
 import antlr4
 import antlr4.error.ErrorListener
@@ -13,7 +14,9 @@ from jep_cmake.parser.cmakeParser import cmakeParser
 _logger = logging.getLogger(__name__)
 
 
-class Transformer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
+class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
+    """CMake analysis of a single file."""
+
     def __init__(self):
         #: Compilation unit AST element built during last transformation.
         self.compilation_unit = None
@@ -29,7 +32,7 @@ class Transformer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         #: Current command being parsed.
         self._current_command = None
 
-    def read(self, filepath, data=None) -> CompilationUnit:
+    def analyze(self, filepath, data=None) -> CompilationUnit:
         """Reads CMake file and builds AST from it.
 
         :param filepath: Path to CMake file to be processed.
@@ -38,6 +41,8 @@ class Transformer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         """
 
         self.compilation_unit = CompilationUnit(filepath)
+        self.command_table.clear()
+        self._current_command = None
 
         if data:
             _logger.debug('Parsing data buffer for {}.'.format(filepath))
@@ -60,7 +65,7 @@ class Transformer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         return self.compilation_unit
 
     def syntaxError(self, recognizer, offending_symbol, line, column, msg, e):
-        _logger.error('%s (%d:%d): %s' % (recognizer.getInputStream().tokenSource.inputStream.fileName, line, column, msg))
+        _logger.error('%s (%d:%d): %s' % (self.compilation_unit.filepath, line, column, msg))
 
     def enterCommandInvocation(self, ctx: cmakeParser.CommandInvocationContext):
         # cmake commands are case insensitive:
@@ -97,3 +102,37 @@ class Transformer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
             _logger.debug('Found command definition {}.'.format(command))
 
             self.command_table[command.name] = command
+
+
+class ProjectAnalyzer:
+    """Analysis of a collection of files."""
+
+    def __init__(self):
+        #: File analyzer by filepath.
+        self.file_analyzers = {}
+
+    def analyze(self, filepath, data):
+        """Analyzes given file with optional preread data buffer."""
+
+        file_analyzer = self.file_analyzers.get(filepath)
+        if not file_analyzer:
+            _logger.debug('Setting up new analyzer for file {}.'.format(filepath))
+            file_analyzer = FileAnalyzer()
+            self.file_analyzers[filepath] = file_analyzer
+
+        file_analyzer.analyze(filepath, data)
+
+    def get_possible_commands(self, filepath, pos, prefix):
+        """Returns commands visible in file at position, starting with given prefix."""
+
+        # TODO: incomplete
+
+        file_analyzer = self.file_analyzers.get(filepath)
+        if file_analyzer:
+            origin, _ = os.path.splitext(os.path.basename(file_analyzer.compilation_unit.filepath))
+            return ((command, origin) for command in file_analyzer.command_table)
+        else:
+            _logger.debug('File {} unknown, cannot evaluate completion options.'.format(filepath))
+            return tuple()
+
+

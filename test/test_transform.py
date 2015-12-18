@@ -3,7 +3,7 @@ import os
 import pytest
 
 from jep_cmake.ast import MacroDefinition, FunctionDefinition
-from jep_cmake.transform import Transformer
+from jep_cmake.transform import FileAnalyzer
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -13,8 +13,8 @@ def ch_resources_dir():
 
 
 def test_transformer_read_file():
-    t = Transformer()
-    compilation_unit = t.read('command-def.cmake')
+    t = FileAnalyzer()
+    compilation_unit = t.analyze('command-def.cmake')
 
     found_macro_names = {e.name for e in compilation_unit.fileelements if isinstance(e, MacroDefinition)}
     found_func_names = {e.name for e in compilation_unit.fileelements if isinstance(e, FunctionDefinition)}
@@ -44,8 +44,8 @@ def test_transformer_read_file():
 
 
 def test_transformer_read_buffer():
-    t = Transformer()
-    compilation_unit = t.read('command-def.cmake', data="""
+    t = FileAnalyzer()
+    compilation_unit = t.analyze('command-def.cmake', data="""
 #######################################################################################################################
 # Test file for command definitions in CMake
 #######################################################################################################################

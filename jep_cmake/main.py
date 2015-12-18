@@ -1,17 +1,41 @@
 """jep-cmake entry point."""
 import argparse
+import logging
+import logging.config
+import sys
 
-from jep.backend import Backend, FrontendListener
-from jep.schema import CompletionRequest, CompletionOption, CompletionResponse
+from jep.backend import Backend
+from jep_cmake.dispatch import Listener
 
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s %(name)s %(levelname)s: %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'stream': sys.stdout,
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        }
+    },
+    'loggers': {
+        'jep_cmake': {
+            'handlers': ['console'],
+            'propagate': False,
+            'level': 'DEBUG'
+        }
+    },
+    'root': {
+        'level': 'WARNING',
+        'handlers': ['console']
+    }
+})
 
-class Listener(FrontendListener):
-    def on_completion_request(self, completion_request: CompletionRequest, context):
-        context.send_message(CompletionResponse(completion_request.pos,
-                                                           0,
-                                                           False,
-                                                           [CompletionOption('cmake_completion', 'Something', 'Something to complete')],
-                                                           completion_request.token))
+_logger = logging.getLogger(__name__)
 
 
 def main():
@@ -19,6 +43,7 @@ def main():
     args = parser.parse_args()
 
     backend = Backend([Listener()])
+    _logger.info('CMake backend starting up.')
     backend.start()
 
 
