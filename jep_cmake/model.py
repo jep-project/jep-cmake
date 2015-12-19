@@ -11,14 +11,12 @@ class CMakeFile:
 
 
 class CommandDefinition:
-    def __init__(self, name: str = None, line: int = -1, column: int = -1, length: int = -1):
-        self.name = name
-        self.line = line
-        self.column = column
+    def __init__(self, name: str = None, pos: int = -1, length: int = -1):
+        self.name = pos
         self.length = length
 
     def __repr__(self):
-        return '{}({i.name!r}, {i.line!r}, {i.column!r}, {i.length!r})'.format(self.__class__.__name__, i=self)
+        return '{}({i.name!r}, {i.pos!r}, {i.length!r})'.format(self.__class__.__name__, i=self)
 
 
 class FunctionDefinition(CommandDefinition):

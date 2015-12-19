@@ -24,23 +24,19 @@ def assert_commands(analyzer):
     assert len(analyzer.commands) == 4
     c = analyzer.commands[0]
     assert c.name == 'macro1'
-    assert c.line == 12
-    assert c.column == 7
+    assert c.pos == 420
     assert c.length == 6
     c = analyzer.commands[1]
     assert c.name == 'macro2'
-    assert c.line == 17
-    assert c.column == 8
+    assert c.pos == 611
     assert c.length == 6
     c = analyzer.commands[2]
     assert c.name == 'function1'
-    assert c.line == 20
-    assert c.column == 10
+    assert c.pos == 654
     assert c.length == 9
     c = analyzer.commands[3]
     assert c.name == 'function2'
-    assert c.line == 23
-    assert c.column == 10
+    assert c.pos == 692
     assert c.length == 9
 
 
@@ -78,3 +74,4 @@ endfunction()
     assert analyzer.commands[1].name == 'macroY'
     assert analyzer.commands[2].name == 'functionA'
     assert analyzer.commands[3].name == 'functionB'
+

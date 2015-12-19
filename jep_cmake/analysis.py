@@ -21,6 +21,7 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         self.commands = []
         self.targets = []
         self.variables = []
+        self.errors = []
 
         #: Current command being parsed.
         self._current_command = None
@@ -90,11 +91,8 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
 
             token = ctx.IDENTIFIER().symbol
             command.name = token.text
-            command.line = token.line
-            command.column = 1 + token.column
+            command.pos = token.start
             command.length = 1 + token.stop - token.start
 
             _logger.debug('Found command definition {}.'.format(command))
             self.commands.append(command)
-
-
