@@ -2,8 +2,9 @@ import os
 
 import pytest
 
-from jep_cmake.ast import MacroDefinition, FunctionDefinition
-from jep_cmake.transform import FileAnalyzer
+from jep_cmake.model import MacroDefinition, FunctionDefinition
+from jep_cmake.analysis import FileAnalyzer, MacroDefinition
+from jep_cmake.model import FunctionDefinition, MacroDefinition
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -12,40 +13,40 @@ def ch_resources_dir():
     os.chdir(os.path.join(localdir, 'resources'))
 
 
-def test_transformer_read_file():
-    t = FileAnalyzer()
-    compilation_unit = t.analyze('command-def.cmake')
+def test_analyzer_analyze_file():
+    analyzer = FileAnalyzer()
+    analyzer.analyze('command-def.cmake')
 
-    found_macro_names = {e.name for e in compilation_unit.fileelements if isinstance(e, MacroDefinition)}
-    found_func_names = {e.name for e in compilation_unit.fileelements if isinstance(e, FunctionDefinition)}
+    assert_commands(analyzer)
 
-    assert found_macro_names == {'macro1', 'macro2'}
-    assert found_func_names == {'function1', 'function2'}
 
-    c = t.command_table['macro1']
+def assert_commands(analyzer):
+    assert len(analyzer.commands) == 4
+    c = analyzer.commands[0]
+    assert c.name == 'macro1'
     assert c.line == 12
     assert c.column == 7
     assert c.length == 6
-
-    c = t.command_table['macro2']
+    c = analyzer.commands[1]
+    assert c.name == 'macro2'
     assert c.line == 17
     assert c.column == 8
     assert c.length == 6
-
-    c = t.command_table['function1']
+    c = analyzer.commands[2]
+    assert c.name == 'function1'
     assert c.line == 20
     assert c.column == 10
     assert c.length == 9
-
-    c = t.command_table['function2']
+    c = analyzer.commands[3]
+    assert c.name == 'function2'
     assert c.line == 23
     assert c.column == 10
     assert c.length == 9
 
 
-def test_transformer_read_buffer():
-    t = FileAnalyzer()
-    compilation_unit = t.analyze('command-def.cmake', data="""
+def test_analyzer_analyze_buffer():
+    analyzer = FileAnalyzer()
+    analyzer.analyze('command-def.cmake', data="""
 #######################################################################################################################
 # Test file for command definitions in CMake
 #######################################################################################################################
@@ -72,8 +73,8 @@ function(functionB arg1 arg2)
 endfunction()
 """)
 
-    found_macro_names = {e.name for e in compilation_unit.fileelements if isinstance(e, MacroDefinition)}
-    found_func_names = {e.name for e in compilation_unit.fileelements if isinstance(e, FunctionDefinition)}
-
-    assert found_macro_names == {'macroX', 'macroY'}
-    assert found_func_names == {'functionA', 'functionB'}
+    assert len(analyzer.commands) == 4
+    assert analyzer.commands[0].name == 'macroX'
+    assert analyzer.commands[1].name == 'macroY'
+    assert analyzer.commands[2].name == 'functionA'
+    assert analyzer.commands[3].name == 'functionB'
