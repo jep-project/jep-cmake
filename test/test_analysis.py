@@ -18,22 +18,26 @@ def test_analyzer_analyze_file():
     analyzer = FileAnalyzer()
     analyzer.analyze(cmake_file)
 
+    winpos = [420, 611, 654, 692]
+    linoffset = [11, 16, 19, 21]
+    linpos = [p - o for p, o in zip(winpos, linoffset)]
+
     assert len(cmake_file.commands) == 4
     c = cmake_file.commands[0]
     assert c.name == 'macro1'
-    assert c.pos == 420
+    assert c.pos == winpos[0] or c.pos == linpos[0]
     assert c.length == 6
     c = cmake_file.commands[1]
     assert c.name == 'macro2'
-    assert c.pos == 611
+    assert c.pos == winpos[1] or c.pos == linpos[1]
     assert c.length == 6
     c = cmake_file.commands[2]
     assert c.name == 'function1'
-    assert c.pos == 654
+    assert c.pos == winpos[2] or c.pos == linpos[2]
     assert c.length == 9
     c = cmake_file.commands[3]
     assert c.name == 'function2'
-    assert c.pos == 692
+    assert c.pos == winpos[3] or c.pos == linpos[3]
     assert c.length == 9
 
 
@@ -72,4 +76,3 @@ endfunction()
     assert cmake_file.commands[1].name == 'macroY'
     assert cmake_file.commands[2].name == 'functionA'
     assert cmake_file.commands[3].name == 'functionB'
-
