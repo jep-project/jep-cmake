@@ -19,7 +19,7 @@ def test_analyzer_analyze_file():
     analyzer.analyze(cmake_file)
 
     winpos = [420, 611, 654, 692]
-    linoffset = [11, 16, 19, 21]
+    linoffset = [11, 16, 19, 22]
     linpos = [p - o for p, o in zip(winpos, linoffset)]
 
     assert len(cmake_file.commands) == 4
