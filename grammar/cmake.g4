@@ -22,7 +22,7 @@ commandInvocation
     ;
 
 groupedArguments
-    : '(' argument* ')'
+    : BRACKET_OPEN argument* BRACKET_CLOSE
     ;
 
 argument
@@ -31,6 +31,9 @@ argument
     | IDENTIFIER
     | groupedArguments
     ;
+
+BRACKET_OPEN: '(';
+BRACKET_CLOSE: ')';
 
 IDENTIFIER
     : ('A'..'Z' | 'a'..'z' | '_') ('A'..'Z' | 'a'..'z' | '0'..'9' | '_')*

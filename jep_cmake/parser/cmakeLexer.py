@@ -63,8 +63,8 @@ class cmakeLexer(Lexer):
     decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
 
 
-    T__0 = 1
-    T__1 = 2
+    BRACKET_OPEN = 1
+    BRACKET_CLOSE = 2
     IDENTIFIER = 3
     UNQUOTED_ARGUMENT = 4
     QUOTED_ARGUMENT = 5
@@ -76,12 +76,14 @@ class cmakeLexer(Lexer):
             "'('", "')'" ]
 
     symbolicNames = [ "<INVALID>",
-            "IDENTIFIER", "UNQUOTED_ARGUMENT", "QUOTED_ARGUMENT", "SKIP" ]
+            "BRACKET_OPEN", "BRACKET_CLOSE", "IDENTIFIER", "UNQUOTED_ARGUMENT", 
+            "QUOTED_ARGUMENT", "SKIP" ]
 
-    ruleNames = [ "T__0", "T__1", "IDENTIFIER", "UNQUOTED_ARGUMENT", "UNQUOTED_ELEMENT", 
-                  "QUOTED_ARGUMENT", "QUOTED_ELEMENT", "QUOTED_CONTINUATION", 
-                  "ESCAPE_SEQUENCE", "ESCAPE_IDENTITY", "ESCAPE_ENCODED", 
-                  "ESCAPE_SEMICOLON", "SKIP", "LINEEND", "SPACES", "COMMENT" ]
+    ruleNames = [ "BRACKET_OPEN", "BRACKET_CLOSE", "IDENTIFIER", "UNQUOTED_ARGUMENT", 
+                  "UNQUOTED_ELEMENT", "QUOTED_ARGUMENT", "QUOTED_ELEMENT", 
+                  "QUOTED_CONTINUATION", "ESCAPE_SEQUENCE", "ESCAPE_IDENTITY", 
+                  "ESCAPE_ENCODED", "ESCAPE_SEMICOLON", "SKIP", "LINEEND", 
+                  "SPACES", "COMMENT" ]
 
     grammarFileName = "cmake.g4"
 

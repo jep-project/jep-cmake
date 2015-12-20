@@ -17,35 +17,31 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
     """CMake analysis of a single file."""
 
     def __init__(self):
-        self.filepath = None
-        self.commands = []
-        self.targets = []
-        self.variables = []
-        self.errors = []
-
-        #: Current command being parsed.
+        self._cmake_file = None
+        self._current_command_slot_start = 0
         self._current_command = None
 
     def clear(self):
         self.__init__()
 
-    def analyze(self, filepath, data=None):
+    def analyze(self, cmake_file, data=None):
         """Reads CMake file and builds AST from it.
 
-        :param filepath: Path to CMake file to be processed.
+        :param cmake_file: Container to hold found information.
         :param data: Optional string buffer to read unit from. If not given, the referenced file at ``filepath`` is read.
         :return: Top level ``CompilationUnit`` of read file.
         """
 
         self.clear()
-        self.filepath = filepath
+        self._cmake_file = cmake_file
+        cmake_file.clear()
 
         if data:
-            _logger.debug('Parsing data buffer for {}.'.format(filepath))
+            _logger.debug('Parsing data buffer for {}.'.format(cmake_file.filepath))
             stream = antlr4.InputStream(data)
         else:
-            _logger.debug('Parsing file {}.'.format(filepath))
-            stream = antlr4.FileStream(filepath, encoding='utf-8')
+            _logger.debug('Parsing file {}.'.format(cmake_file.filepath))
+            stream = antlr4.FileStream(cmake_file.filepath, encoding='utf-8')
 
         lexer = cmakeLexer(stream)
         tstream = antlr4.CommonTokenStream(lexer)
@@ -58,6 +54,11 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         walker.walk(self, tree)
         _logger.debug('AST complete.')
 
+        # add last command slot (after last command invocation until end of buffer):
+        cmake_file.append_command_name_slot(self._current_command_slot_start, 1 + stream.size)
+        self._current_command_slot_start = -1
+        self._cmake_file = None
+
     def enter_unhandled_command(self, ctx):
         pass
 
@@ -68,7 +69,7 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         self._current_command = MacroDefinition()
 
     def syntaxError(self, recognizer, offending_symbol, line, column, msg, e):
-        _logger.error('%s (%d:%d): %s' % (self.filepath, line, column, msg))
+        _logger.error('%s (%d:%d): %s' % (self._cmake_file.filepath, line, column, msg))
 
     COMMAND_HANDLER = collections.defaultdict(lambda: FileAnalyzer.enter_unhandled_command,
                                               function=enter_function,
@@ -83,6 +84,12 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
 
         self.COMMAND_HANDLER[command](self, ctx)
 
+        # remember where command names may be inserted (opening bracket can still be moved by command name char)::
+        self._cmake_file.append_command_name_slot(self._current_command_slot_start, ctx.children[1].start.start + 1)
+
+        # next command can start at character following the closing bracket:
+        self._current_command_slot_start = ctx.stop.stop + 1
+
     def enterArgument(self, ctx: cmakeParser.ArgumentContext):
         # for now only record first argument of command definitions:
         if self._current_command:
@@ -95,4 +102,4 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
             command.length = 1 + token.stop - token.start
 
             _logger.debug('Found command definition {}.'.format(command))
-            self.commands.append(command)
+            self._cmake_file.commands.append(command)

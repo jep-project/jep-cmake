@@ -34,7 +34,7 @@ class cmakeParser ( Parser ):
 
     literalNames = [ "<INVALID>", "'('", "')'" ]
 
-    symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "IDENTIFIER", 
+    symbolicNames = [ "<INVALID>", "BRACKET_OPEN", "BRACKET_CLOSE", "IDENTIFIER", 
                       "UNQUOTED_ARGUMENT", "QUOTED_ARGUMENT", "SKIP" ]
 
     RULE_compilationUnit = 0
@@ -47,8 +47,8 @@ class cmakeParser ( Parser ):
                    "groupedArguments", "argument" ]
 
     EOF = Token.EOF
-    T__0=1
-    T__1=2
+    BRACKET_OPEN=1
+    BRACKET_CLOSE=2
     IDENTIFIER=3
     UNQUOTED_ARGUMENT=4
     QUOTED_ARGUMENT=5
@@ -206,6 +206,12 @@ class cmakeParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
 
+        def BRACKET_OPEN(self):
+            return self.getToken(cmakeParser.BRACKET_OPEN, 0)
+
+        def BRACKET_CLOSE(self):
+            return self.getToken(cmakeParser.BRACKET_CLOSE, 0)
+
         def argument(self, i:int=None):
             if i is None:
                 return self.getTypedRuleContexts(cmakeParser.ArgumentContext)
@@ -235,11 +241,11 @@ class cmakeParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 21
-            self.match(cmakeParser.T__0)
+            self.match(cmakeParser.BRACKET_OPEN)
             self.state = 25
             self._errHandler.sync(self)
             _la = self._input.LA(1)
-            while (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << cmakeParser.T__0) | (1 << cmakeParser.IDENTIFIER) | (1 << cmakeParser.UNQUOTED_ARGUMENT) | (1 << cmakeParser.QUOTED_ARGUMENT))) != 0):
+            while (((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << cmakeParser.BRACKET_OPEN) | (1 << cmakeParser.IDENTIFIER) | (1 << cmakeParser.UNQUOTED_ARGUMENT) | (1 << cmakeParser.QUOTED_ARGUMENT))) != 0):
                 self.state = 22
                 self.argument()
                 self.state = 27
@@ -247,7 +253,7 @@ class cmakeParser ( Parser ):
                 _la = self._input.LA(1)
 
             self.state = 28
-            self.match(cmakeParser.T__1)
+            self.match(cmakeParser.BRACKET_CLOSE)
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -311,7 +317,7 @@ class cmakeParser ( Parser ):
                 self.state = 32
                 self.match(cmakeParser.IDENTIFIER)
 
-            elif token in [cmakeParser.T__0]:
+            elif token in [cmakeParser.BRACKET_OPEN]:
                 self.enterOuterAlt(localctx, 4)
                 self.state = 33
                 self.groupedArguments()
