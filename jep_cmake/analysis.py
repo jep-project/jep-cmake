@@ -1,6 +1,7 @@
 """Analysis of a single CMake file through parser invocation."""
 import collections
 import logging
+from concurrent import futures
 
 import antlr4
 import antlr4.error.ErrorListener
@@ -16,6 +17,9 @@ _logger = logging.getLogger(__name__)
 class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
     """CMake analysis of a single file."""
 
+    #: Executor to run CPU-bound analysis in separate process. Important to be defined at class level to allow pickling ``self``.
+    _async_executor = None
+
     def __init__(self):
         self._cmake_file = None
         self._current_command = None
@@ -28,7 +32,7 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
 
         :param cmake_file: Container to hold found information.
         :param data: Optional string buffer to read unit from. If not given, the referenced file at ``filepath`` is read.
-        :return: Top level ``CompilationUnit`` of read file.
+        :return: Reference to filled CMake file container (same as was passed in).
         """
 
         self.clear()
@@ -54,6 +58,23 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         _logger.debug('AST complete.')
 
         self._cmake_file = None
+
+        return cmake_file
+
+    @classmethod
+    def get_async_executor(cls):
+        if not cls._async_executor:
+            cls._async_executor = futures.ProcessPoolExecutor()
+        return cls._async_executor
+
+    def analyze_async(self, cmake_file, data=None):
+        """Calls ``analyze`` asynchronously.
+
+        :param cmake_file: Container to hold found information.
+        :param data: Optional string buffer to read unit from. If not given, the referenced file at ``filepath`` is read.
+        :return: Future to resulting CMake file container.
+        """
+        return self.get_async_executor().submit(self.analyze, cmake_file, data)
 
     def enter_unhandled_command(self, ctx):
         pass

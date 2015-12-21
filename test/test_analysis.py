@@ -76,3 +76,17 @@ endfunction()
     assert cmake_file.commands[1].name == 'macroY'
     assert cmake_file.commands[2].name == 'functionA'
     assert cmake_file.commands[3].name == 'functionB'
+
+
+def test_async_analysis():
+    cmf = CMakeFile('command-def.cmake')
+    analyzer = FileAnalyzer()
+
+    f = analyzer.analyze_async(cmf)
+    cmake_file = f.result()
+
+    assert len(cmake_file.commands) == 4
+    assert cmake_file.commands[0].name == 'macro1'
+    assert cmake_file.commands[1].name == 'macro2'
+    assert cmake_file.commands[2].name == 'function1'
+    assert cmake_file.commands[3].name == 'function2'
