@@ -18,7 +18,6 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
 
     def __init__(self):
         self._cmake_file = None
-        self._current_command_slot_start = 0
         self._current_command = None
 
     def clear(self):
@@ -54,9 +53,6 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         walker.walk(self, tree)
         _logger.debug('AST complete.')
 
-        # add last command slot (after last command invocation until end of buffer):
-        cmake_file.append_command_name_slot(self._current_command_slot_start, 1 + stream.size)
-        self._current_command_slot_start = -1
         self._cmake_file = None
 
     def enter_unhandled_command(self, ctx):
@@ -84,11 +80,8 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
 
         self.COMMAND_HANDLER[command](self, ctx)
 
-        # remember where command names may be inserted (opening bracket can still be moved by command name char)::
-        self._cmake_file.append_command_name_slot(self._current_command_slot_start, ctx.children[1].start.start + 1)
-
-        # next command can start at character following the closing bracket:
-        self._current_command_slot_start = ctx.stop.stop + 1
+        # no command names after opening bracket and before closing bracket:
+        self._cmake_file.prohibit_command_name(ctx.children[1].start.start + 1, ctx.stop.stop + 1)
 
     def enterArgument(self, ctx: cmakeParser.ArgumentContext):
         # for now only record first argument of command definitions:

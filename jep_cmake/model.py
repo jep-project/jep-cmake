@@ -8,27 +8,22 @@ class CMakeFile:
         self.filepath = filepath
         self.commands = []
 
-        # start and end in character stream where command names can be inserted, separated to allow using bisect without explicit key array:
-        self._command_name_starts = []
-        self._command_name_ends = []
+        #: Offsets into file's character stream, where command names begin to be possible and where not.
+        self._command_name_slots = []
 
     def clear(self):
         self.__init__(self.filepath)
 
-    def append_command_name_slot(self, start, end):
-        self._command_name_starts.append(start)
-        self._command_name_ends.append(end)
+    def prohibit_command_name(self, start, end):
+        self._command_name_slots.append(start)
+        self._command_name_slots.append(end)
 
     def __repr__(self):
         return 'CMakeFile({!r})'.format(self.filepath)
 
     def in_command_name_slot(self, pos):
-        """Returns flag if given character position is part of a command name slot."""
-        slot_index = bisect.bisect_right(self._command_name_starts, pos) - 1
-        if slot_index >= 0:
-            return self._command_name_starts[slot_index] <= pos < self._command_name_ends[slot_index]
-        else:
-            return False
+        """Returns flag if given character position is valid for command names."""
+        return bisect.bisect_right(self._command_name_slots, pos) & 1 == 0
 
 
 class CommandDefinition:
