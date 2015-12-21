@@ -23,12 +23,21 @@ class Project:
         :param data: Optional content buffer. If given, this buffer is used instead of the actual file content.
         """
 
+        cmake_file = self.get_cmake_file(filepath)
+        cmake_file_future = self._file_analyzer.analyze_async(cmake_file, data)
+        cmake_file_future.add_done_callback(self.on_cmap_file_analysis_done)
+
+    def get_cmake_file(self, filepath):
         cmake_file = self.cmake_file_map.get(filepath)
         if cmake_file is None:
             cmake_file = CMakeFile(filepath)
             self.cmake_file_map[filepath] = cmake_file
+        return cmake_file
 
-        self._file_analyzer.analyze(cmake_file, data)
+    def on_cmap_file_analysis_done(self, cmake_file_future):
+        cmake_file_parsed = cmake_file_future.result()
+        cmake_file = self.get_cmake_file(cmake_file_parsed.filepath)
+        cmake_file.copy(cmake_file_parsed)
 
     def completion_option_iter(self, filepath, pos):
         """Returns iterator over completion options."""

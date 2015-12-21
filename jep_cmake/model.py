@@ -9,21 +9,26 @@ class CMakeFile:
         self.commands = []
 
         #: Offsets into file's character stream, where command names begin to be possible and where not.
-        self._command_name_slots = []
+        self.command_name_slots = []
+
+    def copy(self, other):
+        self.filepath = other.filepath
+        self.commands = other.commands
+        self.command_name_slots = other.command_name_slots
 
     def clear(self):
         self.__init__(self.filepath)
 
     def prohibit_command_name(self, start, end):
-        self._command_name_slots.append(start)
-        self._command_name_slots.append(end)
+        self.command_name_slots.append(start)
+        self.command_name_slots.append(end)
 
     def __repr__(self):
         return 'CMakeFile({!r})'.format(self.filepath)
 
     def in_command_name_slot(self, pos):
         """Returns flag if given character position is valid for command names."""
-        return bisect.bisect_right(self._command_name_slots, pos) & 1 == 0
+        return bisect.bisect_right(self.command_name_slots, pos) & 1 == 0
 
 
 class CommandDefinition:
