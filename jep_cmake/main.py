@@ -27,7 +27,7 @@ logging.config.dictConfig({
             'handlers': ['console'],
             'propagate': False,
             'level': 'DEBUG'
-        }
+        },
     },
     'root': {
         'level': 'WARNING',
