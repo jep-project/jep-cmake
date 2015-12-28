@@ -1,6 +1,10 @@
 """Knowledge about a CMake project and the file contained. Answers questions about CMake asked by frontend."""
+import fnmatch
 import logging
 import os
+
+import itertools
+import timeit
 
 from jep_cmake.analysis import FileAnalyzer
 from jep_cmake.model import CMakeFile
@@ -10,13 +14,15 @@ _logger = logging.getLogger(__name__)
 
 class Project:
     def __init__(self, srcdir=None, *, file_analyzer_factory=None):
-        # TODO: if srcdir is None, look for .jep file
-        self.srcdir = srcdir
+        self.srcdir = srcdir or os.path.abspath('.')
         self.file_analyzer_factory = file_analyzer_factory or FileAnalyzer
 
         # lookups by filepath:
         self._cmake_file_map = {}
         self._file_analyzer_map = {}
+
+        # start parsing project sources:
+        self.load_cmake_srcdir()
 
     def update(self, filepath, data=None):
         """Updates project after changes to file.
@@ -60,3 +66,21 @@ class Project:
         else:
             _logger.debug('Completion request outside of command slot, pos={}.'.format(pos))
             return []
+
+    def load_cmake_srcdir(self):
+        _logger.debug('Starting to read complete project tree.')
+        count = 0
+        start = timeit.default_timer()
+
+        for dirpath, dirnames, filenames in os.walk(self.srcdir):
+            modules = fnmatch.filter(filenames, '*.cmake')
+            listfiles = fnmatch.filter(filenames, 'CMakeLists.txt')
+
+            filepaths = (os.path.join(dirpath, filename) for filename in itertools.chain(modules, listfiles))
+
+            for path in filepaths:
+                self.update(path)
+                count += 1
+
+        stop = timeit.default_timer()
+        _logger.info('Triggered analysis of {} CMake files in {:.3f} seconds.'.format(count, stop - start))
