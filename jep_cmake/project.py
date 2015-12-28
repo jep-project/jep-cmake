@@ -76,6 +76,7 @@ class Project:
         # for now commands only, no prefix handling yet:
         cmake_file = self._cmake_file_map.get(filepath)
         if cmake_file:
+            _logger.debug('Command slot: {!r}.'.format(cmake_file.command_name_slots))
             if cmake_file.in_command_name_slot(pos):
                 _logger.debug('Completion request in command slot, pos={}.'.format(pos))
                 yield from self.command_iter(cmake_file)

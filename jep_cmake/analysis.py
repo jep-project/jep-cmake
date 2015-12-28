@@ -47,13 +47,15 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         self._cmake_file = cmake_file
         cmake_file.clear()
 
-        if data:
-            _logger.debug('Parsing data buffer for {}.'.format(cmake_file.filepath))
-            stream = antlr4.InputStream(data)
-        else:
+        if not data:
+            # read data buffer first to use Python's universal newline, not present in ANTLR filestream:
             _logger.debug('Parsing file {}.'.format(cmake_file.filepath))
-            stream = antlr4.FileStream(cmake_file.filepath, encoding='utf-8')
+            with open(cmake_file.filepath, encoding='utf-8') as f:
+                data = f.read()
+        else:
+            _logger.debug('Parsing data buffer for {}.'.format(cmake_file.filepath))
 
+        stream = antlr4.InputStream(data)
         lexer = cmakeLexer(stream)
         tstream = antlr4.CommonTokenStream(lexer)
         parser = cmakeParser(tstream)
