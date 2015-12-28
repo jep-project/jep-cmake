@@ -1,6 +1,7 @@
 """Analysis of a single CMake file through parser invocation."""
 import collections
 import logging
+import timeit
 from concurrent import futures
 
 import antlr4
@@ -21,8 +22,15 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
     _async_executor = None
 
     def __init__(self):
+        #: CMake file currently being analyzed.
         self._cmake_file = None
+        #: Cache for tree walker, last found command.
         self._current_command = None
+
+    @property
+    def running(self):
+        """Flag whether this analyzer is currently analyzing a file."""
+        return self._cmake_file is not None
 
     def clear(self):
         self.__init__()
@@ -74,7 +82,18 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         :param data: Optional string buffer to read unit from. If not given, the referenced file at ``filepath`` is read.
         :return: Future to resulting CMake file container.
         """
-        return self.get_async_executor().submit(self.analyze, cmake_file, data)
+        self._cmake_file = cmake_file
+        start = timeit.default_timer()
+
+        def future_done(f):
+            self._cmake_file = None
+            end = timeit.default_timer()
+            _logger.debug('Took {:.3f}s to asynchronously analyze {}.'.format(end - start, cmake_file.filepath))
+
+        future = self.get_async_executor().submit(self.analyze, cmake_file, data)
+        future.add_done_callback(future_done)
+
+        return future
 
     def enter_unhandled_command(self, ctx):
         pass

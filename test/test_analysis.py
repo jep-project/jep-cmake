@@ -16,7 +16,10 @@ def ch_resources_dir():
 def test_analyzer_analyze_file():
     cmake_file = CMakeFile('command-def.cmake')
     analyzer = FileAnalyzer()
+
+    assert not analyzer.running
     analyzer.analyze(cmake_file)
+    assert not analyzer.running
 
     winpos = [420, 611, 654, 692]
     linoffset = [11, 16, 19, 22]
@@ -82,8 +85,11 @@ def test_async_analysis():
     cmf = CMakeFile('command-def.cmake')
     analyzer = FileAnalyzer()
 
+    assert not analyzer.running
     f = analyzer.analyze_async(cmf)
+    assert analyzer.running
     cmake_file = f.result()
+    assert not analyzer.running
 
     assert len(cmake_file.commands) == 4
     assert cmake_file.commands[0].name == 'macro1'
