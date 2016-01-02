@@ -6,6 +6,7 @@ import os
 import itertools
 import timeit
 
+from jep.content import NewlineMode
 from jep_cmake.analysis import FileAnalyzer
 from jep_cmake.model import CMakeFile
 
@@ -29,6 +30,9 @@ class Project:
         # lookup by module name:
         self._module_by_name = {}
 
+        #: detected newline encoding of frontend:
+        self._newline_mode = NewlineMode.Unknown
+
     def update(self, filepath, data=None):
         """Updates project after changes to file.
 
@@ -38,9 +42,14 @@ class Project:
 
         firsttime = len(self._cmake_file_map) == 0
 
+        # try to guess newline encoding from data provided by frontend:
+        if self._newline_mode == NewlineMode.Unknown and data:
+            self._newline_mode = NewlineMode.detect(data)
+            _logger.debug('Detected newline mode 0x{:02x} from backend.'.format(self._newline_mode))
+
         cmake_file = self._get_cmake_file(filepath)
         analyzer = self._file_analyzer_map[filepath]
-        cmake_file_future = analyzer.analyze_async(cmake_file, data)
+        cmake_file_future = analyzer.analyze_async(cmake_file, data, self._newline_mode)
         cmake_file_future.add_done_callback(self.on_cmap_file_analysis_done)
 
         if firsttime:

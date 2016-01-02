@@ -7,6 +7,7 @@ from concurrent import futures
 import antlr4
 import antlr4.error.ErrorListener
 
+from jep.content import NewlineMode
 from jep_cmake.model import FunctionDefinition, MacroDefinition
 from jep_cmake.parser.cmakeLexer import cmakeLexer
 from jep_cmake.parser.cmakeListener import cmakeListener
@@ -35,11 +36,12 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
     def clear(self):
         self.__init__()
 
-    def analyze(self, cmake_file, data=None):
+    def analyze(self, cmake_file, data=None, newline_mode=NewlineMode.Unknown):
         """Reads CMake file and builds AST from it.
 
         :param cmake_file: Container to hold found information.
         :param data: Optional string buffer to read unit from. If not given, the referenced file at ``filepath`` is read.
+        :param newline_mode: Newline mode (of frontend) to be matched when reading files from disk to get correct character indexes.
         :return: Reference to filled CMake file container (same as was passed in).
         """
 
@@ -50,7 +52,8 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         if not data:
             # read data buffer first to use Python's universal newline, not present in ANTLR filestream:
             _logger.debug('Parsing file {}.'.format(cmake_file.filepath))
-            with open(cmake_file.filepath, encoding='utf-8') as f:
+
+            with open(cmake_file.filepath, encoding='utf-8', newline=NewlineMode.open_newline_mode(newline_mode)) as f:
                 data = f.read()
         else:
             _logger.debug('Parsing data buffer for {}.'.format(cmake_file.filepath))
@@ -77,11 +80,12 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
             cls._async_executor = futures.ProcessPoolExecutor()
         return cls._async_executor
 
-    def analyze_async(self, cmake_file, data=None):
+    def analyze_async(self, cmake_file, data=None, newline_mode=NewlineMode.Unknown):
         """Calls ``analyze`` asynchronously.
 
         :param cmake_file: Container to hold found information.
         :param data: Optional string buffer to read unit from. If not given, the referenced file at ``filepath`` is read.
+        :param newline_mode: Newline mode (of frontend) to be matched when reading files from disk to get correct character indexes.
         :return: Future to resulting CMake file container.
         """
         self._cmake_file = cmake_file
