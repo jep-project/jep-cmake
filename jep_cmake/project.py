@@ -45,7 +45,7 @@ class Project:
         # try to guess newline encoding from data provided by frontend:
         if self._newline_mode == NewlineMode.Unknown and data:
             self._newline_mode = NewlineMode.detect(data)
-            _logger.debug('Detected newline mode 0x{:02x} from backend.'.format(self._newline_mode))
+            _logger.debug('Detected newline mode 0x{:02x} from frontend.'.format(self._newline_mode))
 
         cmake_file = self._get_cmake_file(filepath)
         analyzer = self._file_analyzer_map[filepath]
