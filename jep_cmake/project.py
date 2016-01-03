@@ -105,9 +105,21 @@ class Project:
             _logger.debug('Cannot return code completion options for unknown file {}.'.format(filepath))
 
     def command_iter(self, cmake_file):
-        commands = cmake_file.command_definitions
+        visited_filepaths = set()
+        return self._command_iter(cmake_file, visited_filepaths)
+
+    def _command_iter(self, cmake_file, visited_filepaths):
+        # first return the commands of this cmake file:
+        visited_filepaths.add(cmake_file.filepath)
         origin, _ = os.path.splitext(os.path.basename(cmake_file.filepath))
-        return ((command.name, origin) for command in commands)
+        for command in cmake_file.command_definitions:
+            yield (command.name, origin)
+
+        # now return commands from included modules (recursively):
+        for included_cmake_file in cmake_file.resolved_includes:
+            # prevent following circular dependencies:
+            if included_cmake_file.filepath not in visited_filepaths:
+                yield from self._command_iter(included_cmake_file, visited_filepaths)
 
     def load_cmake_srcdir(self):
         _logger.debug('Starting to read complete project tree.')

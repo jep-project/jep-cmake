@@ -22,3 +22,26 @@ def test_module_resolution():
 
     included_cmake_filepath = os.path.abspath('SomeModule.cmake')
     assert cmake_file.resolved_includes[0] is project.cmake_file_by_path[included_cmake_filepath]
+
+
+def test_recursive_command_resolution():
+    project = Project()
+    cmake_filepath = os.path.abspath('command-def.cmake')
+    included_cmake_filepath = os.path.abspath('SomeModule.cmake')
+    third_cmake_filepath = os.path.abspath('ThirdModule.cmake')
+
+    # force all files to be read completely:
+    project.update(cmake_filepath).result()
+    project.update(included_cmake_filepath).result()
+    project.update(third_cmake_filepath).result()
+
+    commands = set(project.command_iter(project.cmake_file_by_path[cmake_filepath]))
+
+    # make sure all visible commands are available
+    assert len(commands) == 6
+    assert ('macro1', 'command-def') in commands
+    assert ('macro2', 'command-def') in commands
+    assert ('function1', 'command-def') in commands
+    assert ('function2', 'command-def') in commands
+    assert ('func_from_included', 'SomeModule') in commands
+    assert ('func_from_third', 'ThirdModule') in commands
