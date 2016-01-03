@@ -73,7 +73,7 @@ class Project:
     def on_cmap_file_analysis_done(self, cmake_file_future):
         cmake_file_parsed = cmake_file_future.result()
         cmake_file = self._get_cmake_file(cmake_file_parsed.filepath)
-        cmake_file.copy(cmake_file_parsed)
+        cmake_file.movefrom(cmake_file_parsed)
 
     def completion_option_iter(self, filepath, pos):
         """Returns iterator over completion options."""

@@ -6,15 +6,23 @@ import collections
 class CMakeFile:
     def __init__(self, filepath: str):
         self.filepath = filepath
+        #: List of command names defined in this file.
         self.commands = []
+        #: List of CMake modules loaded via import statements (without '.cmake' extension).
+        self.imports = []
 
         #: Offsets into file's character stream, where command names begin to be possible and where not.
         self.command_name_slots = []
 
-    def copy(self, other):
+    def movefrom(self, other):
+        """Move content of other CMake file into this one."""
+
         self.filepath = other.filepath
         self.commands = other.commands
+        self.imports = other.imports
         self.command_name_slots = other.command_name_slots
+
+        other.clear()
 
     def clear(self):
         self.__init__(self.filepath)
@@ -31,7 +39,7 @@ class CMakeFile:
         return bisect.bisect_right(self.command_name_slots, pos) & 1 == 0
 
 
-class CommandDefinition:
+class CommandInvocation:
     def __init__(self, name: str = None, pos: int = -1, length: int = -1):
         self.name = pos
         self.length = length
@@ -40,9 +48,17 @@ class CommandDefinition:
         return '{}({i.name!r}, {i.pos!r}, {i.length!r})'.format(self.__class__.__name__, i=self)
 
 
+class CommandDefinition(CommandInvocation):
+    pass
+
+
 class FunctionDefinition(CommandDefinition):
     pass
 
 
 class MacroDefinition(CommandDefinition):
+    pass
+
+
+class ModuleInclude(CommandInvocation):
     pass

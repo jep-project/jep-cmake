@@ -8,7 +8,7 @@ import antlr4
 import antlr4.error.ErrorListener
 
 from jep.content import NewlineMode
-from jep_cmake.model import FunctionDefinition, MacroDefinition
+from jep_cmake.model import FunctionDefinition, MacroDefinition, ModuleInclude
 from jep_cmake.parser.cmakeLexer import cmakeLexer
 from jep_cmake.parser.cmakeListener import cmakeListener
 from jep_cmake.parser.cmakeParser import cmakeParser
@@ -27,6 +27,8 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         self._cmake_file = None
         #: Cache for tree walker, last found command.
         self._current_command = None
+        #: Cache for tree walker, collection in CMake container to add last processed command to.
+        self._current_command_list = None
 
     @property
     def running(self):
@@ -106,16 +108,25 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
 
     def enter_function(self, ctx):
         self._current_command = FunctionDefinition()
+        self._current_command_list = self._cmake_file.commands
 
     def enter_macro(self, ctx):
         self._current_command = MacroDefinition()
+        self._current_command_list = self._cmake_file.commands
+
+    def enter_include(self, ctx):
+        self._current_command = ModuleInclude()
+        self._current_command_list = self._cmake_file.imports
 
     def syntaxError(self, recognizer, offending_symbol, line, column, msg, e):
         _logger.error('%s (%d:%d): %s' % (self._cmake_file.filepath, line, column, msg))
 
-    COMMAND_HANDLER = collections.defaultdict(lambda: FileAnalyzer.enter_unhandled_command,
-                                              function=enter_function,
-                                              macro=enter_macro)
+    COMMAND_HANDLER = collections.defaultdict(lambda: FileAnalyzer.enter_unhandled_command)
+    COMMAND_HANDLER.update({
+        'function': enter_function,
+        'macro': enter_macro,
+        'include': enter_include
+    })
 
     def enterCommandInvocation(self, ctx: cmakeParser.CommandInvocationContext):
         # cmake commands are case insensitive:
@@ -135,10 +146,21 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
             command = self._current_command
             self._current_command = None
 
-            token = ctx.IDENTIFIER().symbol
-            command.name = token.text
-            command.pos = token.start
-            command.length = 1 + token.stop - token.start
+            # get the token that was used for this argument:
+            quoted = False
+            token = ctx.IDENTIFIER()
+            if not token:
+                token = ctx.UNQUOTED_ARGUMENT()
+            if not token:
+                quoted = True
+                token = ctx.QUOTED_ARGUMENT()
+            if not token:
+                # other forms (e.g. grouped) not handled at this level, dive down:
+                return
 
-            _logger.debug('Found command definition {}.'.format(command))
-            self._cmake_file.commands.append(command)
+            symbol = token.symbol
+            command.name = symbol.text if not quoted else symbol.text[1:-1]
+            command.pos = symbol.start
+            command.length = 1 + symbol.stop - symbol.start
+
+            self._current_command_list.append(command)

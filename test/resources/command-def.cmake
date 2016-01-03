@@ -7,6 +7,7 @@ endif(COMMAND_DEF_INCLUDED)
 set(COMMAND_DEF_INCLUDED true)
 
 include(SomeModule)
+include("OtherModule.cmake")
 
 
 macro(macro1)

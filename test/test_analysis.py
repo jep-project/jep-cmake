@@ -21,7 +21,7 @@ def test_analyzer_analyze_file():
     analyzer.analyze(cmake_file)
     assert not analyzer.running
 
-    winpos = [420, 611, 654, 692]
+    winpos = [449, 640, 683, 721]
     linoffset = [11, 16, 19, 22]
     linpos = [p - o for p, o in zip(winpos, linoffset)]
 
@@ -42,6 +42,10 @@ def test_analyzer_analyze_file():
     assert c.name == 'function2'
     assert c.pos == winpos[3] or c.pos == linpos[3]
     assert c.length == 9
+
+    assert len(cmake_file.imports) == 2
+    assert cmake_file.imports[0].name == 'SomeModule'
+    assert cmake_file.imports[1].name == 'OtherModule.cmake'
 
 
 def test_analyzer_analyze_buffer():
