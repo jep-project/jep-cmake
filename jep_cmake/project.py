@@ -19,7 +19,7 @@ CMAKE_LISTFILE_NAME = 'CMakeLists.txt'
 
 
 class Project:
-    def __init__(self, srcdir=None, *, file_analyzer_factory=None):
+    def __init__(self, *, srcdir=None, cmake_version='3.4', builtin_commands=False, ctest_commands=False, deprecated_commands=False, file_analyzer_factory=None):
         #: CMake source directory of project.
         self.srcdir = srcdir or os.path.abspath('.')
         #: Factory function for cmake file parser.
@@ -34,6 +34,21 @@ class Project:
 
         #: detected newline encoding of frontend:
         self._newline_mode = NewlineMode.Unknown
+
+        #: built-in command resolution:
+        command_list_dirpath = os.path.join(os.path.dirname(__file__), 'built-ins')
+        self.builtin_commands = []
+        if builtin_commands:
+            self.include_builtins(cmake_version, command_list_dirpath, 'cmake')
+        if ctest_commands:
+            self.include_builtins(cmake_version, command_list_dirpath, 'ctest')
+        if deprecated_commands:
+            self.include_builtins(cmake_version, command_list_dirpath, 'deprecated')
+
+    def include_builtins(self, cmake_version, commandlist_dirpath, tag):
+        with open(os.path.join(commandlist_dirpath, '{version}-{tag}.txt'.format(version=cmake_version, tag=tag))) as commandfile:
+            for command in commandfile:
+                self.builtin_commands.append((command.strip(), tag))
 
     def update(self, filepath, data=None):
         """Updates project after changes to file.
@@ -97,8 +112,6 @@ class Project:
             if cmake_file.in_command_name_slot(pos):
                 _logger.debug('Completion request in command slot, pos={}.'.format(pos))
                 yield from self.command_iter(cmake_file)
-                for included_cmake_file in cmake_file.resolved_includes:
-                    yield from self.command_iter(included_cmake_file)
             else:
                 _logger.debug('Completion request outside of command slot, pos={}.'.format(pos))
         else:
@@ -106,7 +119,8 @@ class Project:
 
     def command_iter(self, cmake_file):
         visited_filepaths = set()
-        return self._command_iter(cmake_file, visited_filepaths)
+        yield from self._command_iter(cmake_file, visited_filepaths)
+        yield from self.builtin_commands
 
     def _command_iter(self, cmake_file, visited_filepaths):
         # first return the commands of this cmake file:

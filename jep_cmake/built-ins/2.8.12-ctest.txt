@@ -1,0 +1,13 @@
+ctest_build
+ctest_configure
+ctest_coverage
+ctest_empty_binary_directory
+ctest_memcheck
+ctest_read_custom_files
+ctest_run_script
+ctest_sleep
+ctest_start
+ctest_submit
+ctest_test
+ctest_update
+ctest_upload

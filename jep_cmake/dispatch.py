@@ -7,8 +7,11 @@ from jep_cmake.project import Project
 
 
 class Listener(FrontendListener):
-    def __init__(self, *, project=None):
-        self.project = project or Project()
+    def __init__(self, *, cmake_version, builtin_commands, deprecated_commands, ctest_commands, project=None):
+        self.project = project or Project(cmake_version=cmake_version,
+                                          builtin_commands=builtin_commands,
+                                          ctest_commands=ctest_commands,
+                                          deprecated_commands=deprecated_commands)
 
     def on_content_sync(self, content_sync, context):
         # backend has already synchronized latest content, so launch parse:

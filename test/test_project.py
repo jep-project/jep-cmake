@@ -45,3 +45,47 @@ def test_recursive_command_resolution():
     assert ('function2', 'command-def') in commands
     assert ('func_from_included', 'SomeModule') in commands
     assert ('func_from_third', 'ThirdModule') in commands
+
+
+def test_builtin_command_resolution_none():
+    project = Project()
+    cmake_filepath = os.path.abspath('command-def.cmake')
+    project.update(cmake_filepath).result()
+    commands = set(project.command_iter(project.cmake_file_by_path[cmake_filepath]))
+
+    assert ('add_library', 'cmake') not in commands
+    assert ('ctest_configure', 'ctest') not in commands
+    assert ('exec_program', 'deprecated') not in commands
+
+
+def test_builtin_command_resolution_cmake():
+    project = Project(builtin_commands=True)
+    cmake_filepath = os.path.abspath('command-def.cmake')
+    project.update(cmake_filepath).result()
+    commands = set(project.command_iter(project.cmake_file_by_path[cmake_filepath]))
+
+    assert ('add_library', 'cmake') in commands
+    assert ('ctest_configure', 'ctest') not in commands
+    assert ('exec_program', 'deprecated') not in commands
+
+
+def test_builtin_command_resolution_ctest():
+    project = Project(ctest_commands=True)
+    cmake_filepath = os.path.abspath('command-def.cmake')
+    project.update(cmake_filepath).result()
+    commands = set(project.command_iter(project.cmake_file_by_path[cmake_filepath]))
+
+    assert ('add_library', 'cmake') not in commands
+    assert ('ctest_configure', 'ctest') in commands
+    assert ('exec_program', 'deprecated') not in commands
+
+
+def test_builtin_command_resolution_deprecated():
+    project = Project(deprecated_commands=True)
+    cmake_filepath = os.path.abspath('command-def.cmake')
+    project.update(cmake_filepath).result()
+    commands = set(project.command_iter(project.cmake_file_by_path[cmake_filepath]))
+
+    assert ('add_library', 'cmake') not in commands
+    assert ('ctest_configure', 'ctest') not in commands
+    assert ('exec_program', 'deprecated') in commands
