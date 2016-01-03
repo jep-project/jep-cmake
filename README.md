@@ -41,4 +41,25 @@ contains CMake files should be enough:
     *.cmake,CMakeLists.txt:
     jep-cmake
 
-Currently `jep-cmake` does not take any command line arguments.
+See `jep-cmake -h` for available command line options:
+
+    > jep-cmake -h
+    usage: jep-cmake-script.py [-h] [--version {2.8.12,3.4}] [--builtin-cmake]
+                               [--builtin-ctest] [--builtin-deprecated]
+    
+    JEP backend providing CMake editing support.
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      --version {2.8.12,3.4}
+                            CMake version to be supported, mainly used for
+                            completion of built-in commands.
+      --builtin-cmake       If specified, built-in CMake commands are part of code
+                            completion.
+      --builtin-ctest       If specified, built-in ctest commands are part of code
+                            completion.
+      --builtin-deprecated  If specified, built-in CMake commands that have been
+                            deprecated are part of code completion.
+
+The various built-in options are available to finetune the backend's interaction with the editor being used. Some editors already support code completion for built-in
+CMake commands. In that case it is more efficient remove them from the backends completion options (by not specifying the corresponding command line option). 
