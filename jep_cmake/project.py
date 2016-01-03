@@ -97,7 +97,7 @@ class Project:
             _logger.debug('Cannot return code completion options for unknown file {}.'.format(filepath))
 
     def command_iter(self, cmake_file):
-        commands = cmake_file.commands
+        commands = cmake_file.command_definitions
         origin, _ = os.path.splitext(os.path.basename(cmake_file.filepath))
         return ((command.name, origin) for command in commands)
 

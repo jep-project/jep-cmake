@@ -6,8 +6,8 @@ import collections
 class CMakeFile:
     def __init__(self, filepath: str):
         self.filepath = filepath
-        #: List of command names defined in this file.
-        self.commands = []
+        #: List of commands defined in this file.
+        self.command_definitions = []
         #: List of CMake modules loaded via import statements (without '.cmake' extension).
         self.imports = []
 
@@ -18,7 +18,7 @@ class CMakeFile:
         """Move content of other CMake file into this one."""
 
         self.filepath = other.filepath
-        self.commands = other.commands
+        self.command_definitions = other.command_definitions
         self.imports = other.imports
         self.command_name_slots = other.command_name_slots
 
@@ -40,17 +40,20 @@ class CMakeFile:
 
 
 class CommandInvocation:
-    def __init__(self, name: str = None, pos: int = -1, length: int = -1):
-        self.name = name
+    def __init__(self, arg0: str = None, pos: int = -1, length: int = -1):
+        #: First argument of command invocation.
+        self.arg0 = arg0
         self.pos = pos
         self.length = length
 
     def __repr__(self):
-        return '{}({i.name!r}, {i.pos!r}, {i.length!r})'.format(self.__class__.__name__, i=self)
+        return '{}({i.arg0!r}, {i.pos!r}, {i.length!r})'.format(self.__class__.__name__, i=self)
 
 
 class CommandDefinition(CommandInvocation):
-    pass
+    @property
+    def name(self):
+        return self.arg0
 
 
 class FunctionDefinition(CommandDefinition):
@@ -62,4 +65,6 @@ class MacroDefinition(CommandDefinition):
 
 
 class ModuleInclude(CommandInvocation):
-    pass
+    @property
+    def module(self):
+        return self.arg0

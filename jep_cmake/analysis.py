@@ -108,11 +108,11 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
 
     def enter_function(self, ctx):
         self._current_command = FunctionDefinition()
-        self._current_command_list = self._cmake_file.commands
+        self._current_command_list = self._cmake_file.command_definitions
 
     def enter_macro(self, ctx):
         self._current_command = MacroDefinition()
-        self._current_command_list = self._cmake_file.commands
+        self._current_command_list = self._cmake_file.command_definitions
 
     def enter_include(self, ctx):
         self._current_command = ModuleInclude()
@@ -159,8 +159,9 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
                 return
 
             symbol = token.symbol
-            command.name = symbol.text if not quoted else symbol.text[1:-1]
+            command.arg0 = symbol.text if not quoted else symbol.text[1:-1]
             command.pos = symbol.start
             command.length = 1 + symbol.stop - symbol.start
 
             self._current_command_list.append(command)
+            self._current_command_list = None

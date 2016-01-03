@@ -25,27 +25,27 @@ def test_analyzer_analyze_file():
     linoffset = [11, 16, 19, 22]
     linpos = [p - o for p, o in zip(winpos, linoffset)]
 
-    assert len(cmake_file.commands) == 4
-    c = cmake_file.commands[0]
+    assert len(cmake_file.command_definitions) == 4
+    c = cmake_file.command_definitions[0]
     assert c.name == 'macro1'
     assert c.pos == winpos[0] or c.pos == linpos[0]
     assert c.length == 6
-    c = cmake_file.commands[1]
+    c = cmake_file.command_definitions[1]
     assert c.name == 'macro2'
     assert c.pos == winpos[1] or c.pos == linpos[1]
     assert c.length == 6
-    c = cmake_file.commands[2]
+    c = cmake_file.command_definitions[2]
     assert c.name == 'function1'
     assert c.pos == winpos[2] or c.pos == linpos[2]
     assert c.length == 9
-    c = cmake_file.commands[3]
+    c = cmake_file.command_definitions[3]
     assert c.name == 'function2'
     assert c.pos == winpos[3] or c.pos == linpos[3]
     assert c.length == 9
 
     assert len(cmake_file.imports) == 2
-    assert cmake_file.imports[0].name == 'SomeModule'
-    assert cmake_file.imports[1].name == 'OtherModule.cmake'
+    assert cmake_file.imports[0].module == 'SomeModule'
+    assert cmake_file.imports[1].module == 'OtherModule.cmake'
 
 
 def test_analyzer_analyze_buffer():
@@ -78,11 +78,11 @@ function(functionB arg1 arg2)
 endfunction()
 """)
 
-    assert len(cmake_file.commands) == 4
-    assert cmake_file.commands[0].name == 'macroX'
-    assert cmake_file.commands[1].name == 'macroY'
-    assert cmake_file.commands[2].name == 'functionA'
-    assert cmake_file.commands[3].name == 'functionB'
+    assert len(cmake_file.command_definitions) == 4
+    assert cmake_file.command_definitions[0].name == 'macroX'
+    assert cmake_file.command_definitions[1].name == 'macroY'
+    assert cmake_file.command_definitions[2].name == 'functionA'
+    assert cmake_file.command_definitions[3].name == 'functionB'
 
 
 def test_async_analysis():
@@ -95,8 +95,8 @@ def test_async_analysis():
     cmake_file = f.result()
     assert not analyzer.running
 
-    assert len(cmake_file.commands) == 4
-    assert cmake_file.commands[0].name == 'macro1'
-    assert cmake_file.commands[1].name == 'macro2'
-    assert cmake_file.commands[2].name == 'function1'
-    assert cmake_file.commands[3].name == 'function2'
+    assert len(cmake_file.command_definitions) == 4
+    assert cmake_file.command_definitions[0].name == 'macro1'
+    assert cmake_file.command_definitions[1].name == 'macro2'
+    assert cmake_file.command_definitions[2].name == 'function1'
+    assert cmake_file.command_definitions[3].name == 'function2'
