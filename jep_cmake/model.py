@@ -41,7 +41,8 @@ class CMakeFile:
 
 class CommandInvocation:
     def __init__(self, name: str = None, pos: int = -1, length: int = -1):
-        self.name = pos
+        self.name = name
+        self.pos = pos
         self.length = length
 
     def __repr__(self):
