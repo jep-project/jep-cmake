@@ -34,7 +34,7 @@ After installation, the Python environment has a new command `jep-cmake`, that w
 
 ## Usage
 
-See the [JEP protocol|https://github.com/jep-project/jep/blob/master/protocol.md] for detailed instruction how to configure JEP via a
+See the [JEP protocol](https://github.com/jep-project/jep/blob/master/protocol.md) for detailed instruction how to configure JEP via a
 `.jep` file. In the most simple situation (`jep-cmake` in path, ...) the following `.jep` file in the root folder of your project that
 contains CMake files should be enough:
 
