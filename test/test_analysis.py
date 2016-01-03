@@ -2,9 +2,8 @@ import os
 
 import pytest
 
-from jep_cmake.model import MacroDefinition, FunctionDefinition, CMakeFile
-from jep_cmake.analysis import FileAnalyzer, MacroDefinition
-from jep_cmake.model import FunctionDefinition, MacroDefinition
+from jep_cmake.model import CMakeFile
+from jep_cmake.analysis import FileAnalyzer
 
 
 @pytest.fixture(scope="module", autouse=True)

@@ -9,11 +9,11 @@ improve their CMake editing support beyong pure syntax highlighting.
 
 * Parser for CMake files.
 * Builds dictionary of user functions and macros.
-* Code completion of commands (built-in and user functions and macros), currently from all modules (import not evaluated) and local file.
+* Code completion of commands (built-in and user functions and macros), from local and (directly or indirectly) imported modules.
 
 ## Upcoming features and feature ideas
 
-* Code completion for all files in a project, respecting CMake scope rules and module imports.
+* Code completion for all files in a project, including parent CMake files.
 * Code completion for variables (respecting scope rules).
 * Code completion for targets.
 * Go to definition of commands, variables, targets.
