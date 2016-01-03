@@ -116,7 +116,7 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
 
     def enter_include(self, ctx):
         self._current_command = ModuleInclude()
-        self._current_command_list = self._cmake_file.imports
+        self._current_command_list = self._cmake_file.includes
 
     def syntaxError(self, recognizer, offending_symbol, line, column, msg, e):
         _logger.error('%s (%d:%d): %s' % (self._cmake_file.filepath, line, column, msg))

@@ -8,18 +8,21 @@ class CMakeFile:
         self.filepath = filepath
         #: List of commands defined in this file.
         self.command_definitions = []
-        #: List of CMake modules loaded via import statements (without '.cmake' extension).
-        self.imports = []
+        #: List of CMake modules loaded via include statements (without '.cmake' extension).
+        self.includes = []
 
         #: Offsets into file's character stream, where command names begin to be possible and where not.
         self.command_name_slots = []
+
+        #: Resolved references to included modules.
+        self.resolved_includes = []
 
     def movefrom(self, other):
         """Move content of other CMake file into this one."""
 
         self.filepath = other.filepath
         self.command_definitions = other.command_definitions
-        self.imports = other.imports
+        self.includes = other.includes
         self.command_name_slots = other.command_name_slots
 
         other.clear()
@@ -66,5 +69,5 @@ class MacroDefinition(CommandDefinition):
 
 class ModuleInclude(CommandInvocation):
     @property
-    def module(self):
+    def modulename(self):
         return self.arg0

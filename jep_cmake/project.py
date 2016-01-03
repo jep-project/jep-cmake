@@ -6,6 +6,8 @@ import os
 import itertools
 import timeit
 
+import collections
+
 from jep.content import NewlineMode
 from jep_cmake.analysis import FileAnalyzer
 from jep_cmake.model import CMakeFile
@@ -24,11 +26,11 @@ class Project:
         self.file_analyzer_factory = file_analyzer_factory or FileAnalyzer
 
         # lookups by filepath:
-        self._cmake_file_map = {}
-        self._file_analyzer_map = {}
+        self.cmake_file_by_path = {}
+        self._analyzer_by_path = {}
 
         # lookup by module name:
-        self._module_by_name = {}
+        self._module_by_name = collections.defaultdict(lambda: None)
 
         #: detected newline encoding of frontend:
         self._newline_mode = NewlineMode.Unknown
@@ -38,9 +40,10 @@ class Project:
 
         :param filepath: Path to file that was changed.
         :param data: Optional content buffer. If given, this buffer is used instead of the actual file content.
+        :return: Future to parsed CMake file (mainly for testing).
         """
 
-        firsttime = len(self._cmake_file_map) == 0
+        firsttime = len(self.cmake_file_by_path) == 0
 
         # try to guess newline encoding from data provided by frontend:
         if self._newline_mode == NewlineMode.Unknown and data:
@@ -48,19 +51,21 @@ class Project:
             _logger.debug('Detected newline mode 0x{:02x} from frontend.'.format(self._newline_mode))
 
         cmake_file = self._get_cmake_file(filepath)
-        analyzer = self._file_analyzer_map[filepath]
+        analyzer = self._analyzer_by_path[filepath]
         cmake_file_future = analyzer.analyze_async(cmake_file, data, self._newline_mode)
         cmake_file_future.add_done_callback(self.on_cmap_file_analysis_done)
 
         if firsttime:
             self.load_cmake_srcdir()
 
+        return cmake_file_future
+
     def _get_cmake_file(self, filepath):
-        cmake_file = self._cmake_file_map.get(filepath)
+        cmake_file = self.cmake_file_by_path.get(filepath)
         if cmake_file is None:
             cmake_file = CMakeFile(filepath)
-            self._cmake_file_map[filepath] = cmake_file
-            self._file_analyzer_map[filepath] = self.file_analyzer_factory()
+            self.cmake_file_by_path[filepath] = cmake_file
+            self._analyzer_by_path[filepath] = self.file_analyzer_factory()
 
             # remember CMake modules:
             if fnmatch.fnmatch(filepath, CMAKE_MODULEFILE_PATTERN):
@@ -75,6 +80,9 @@ class Project:
         cmake_file = self._get_cmake_file(cmake_file_parsed.filepath)
         cmake_file.movefrom(cmake_file_parsed)
 
+        # complete cmake file with project level data:
+        cmake_file.resolved_includes = list(filter(None, (self._module_by_name[include.modulename] for include in cmake_file.includes)))
+
     def completion_option_iter(self, filepath, pos):
         """Returns iterator over completion options."""
 
@@ -83,14 +91,14 @@ class Project:
         # TODO: later, determine type of allowed token
 
         # for now commands only, no prefix handling yet:
-        cmake_file = self._cmake_file_map.get(filepath)
+        cmake_file = self.cmake_file_by_path.get(filepath)
         if cmake_file:
             _logger.debug('Command slot: {!r}.'.format(cmake_file.command_name_slots))
             if cmake_file.in_command_name_slot(pos):
                 _logger.debug('Completion request in command slot, pos={}.'.format(pos))
                 yield from self.command_iter(cmake_file)
-                for visible_cmake_file in self.get_preloaded_cmake_files(cmake_file):
-                    yield from self.command_iter(visible_cmake_file)
+                for included_cmake_file in cmake_file.resolved_includes:
+                    yield from self.command_iter(included_cmake_file)
             else:
                 _logger.debug('Completion request outside of command slot, pos={}.'.format(pos))
         else:
@@ -119,10 +127,3 @@ class Project:
         stop = timeit.default_timer()
         _logger.info('Triggered analysis of {} CMake files in {:.3f} seconds.'.format(count, stop - start))
         _logger.info('Found {} CMake modules.'.format(len(self._module_by_name)))
-
-    def get_preloaded_cmake_files(self, cmake_file):
-        """Returns list of CMake files whose contents are visible to given file."""
-        # TODO: evaluate imports and hierarchy, depending on file extension.
-
-        # dummy, just return all known modules:
-        return self._module_by_name.values()

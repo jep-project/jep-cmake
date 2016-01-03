@@ -43,9 +43,9 @@ def test_analyzer_analyze_file():
     assert c.pos == winpos[3] or c.pos == linpos[3]
     assert c.length == 9
 
-    assert len(cmake_file.imports) == 2
-    assert cmake_file.imports[0].module == 'SomeModule'
-    assert cmake_file.imports[1].module == 'OtherModule.cmake'
+    assert len(cmake_file.includes) == 2
+    assert cmake_file.includes[0].modulename == 'SomeModule'
+    assert cmake_file.includes[1].modulename == 'OtherModule.cmake'
 
 
 def test_analyzer_analyze_buffer():
