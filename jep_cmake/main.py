@@ -4,7 +4,7 @@ import logging
 import logging.config
 import sys
 
-from jep.backend import Backend
+from jep_py.backend import Backend
 from jep_cmake.dispatch import Listener
 
 logging.config.dictConfig({

@@ -1,6 +1,5 @@
 """CMake object model."""
 import bisect
-import collections
 
 
 class CMakeFile:

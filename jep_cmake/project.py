@@ -8,7 +8,7 @@ import timeit
 
 import collections
 
-from jep.content import NewlineMode
+from jep_py.content import NewlineMode
 from jep_cmake.analysis import FileAnalyzer
 from jep_cmake.model import CMakeFile
 

@@ -7,7 +7,7 @@ from concurrent import futures
 import antlr4
 import antlr4.error.ErrorListener
 
-from jep.content import NewlineMode
+from jep_py.content import NewlineMode
 from jep_cmake.model import FunctionDefinition, MacroDefinition, ModuleInclude
 from jep_cmake.parser.cmakeLexer import cmakeLexer
 from jep_cmake.parser.cmakeListener import cmakeListener

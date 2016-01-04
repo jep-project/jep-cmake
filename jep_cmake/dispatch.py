@@ -1,8 +1,6 @@
 """Dispatch of requests and commands from frontend."""
-import os
-
-from jep.backend import FrontendListener
-from jep.schema import CompletionRequest, CompletionResponse, CompletionOption, SemanticType
+from jep_py.backend import FrontendListener
+from jep_py.schema import CompletionRequest, CompletionResponse, CompletionOption, SemanticType
 from jep_cmake.project import Project
 
 
