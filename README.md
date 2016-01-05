@@ -27,7 +27,6 @@ follow this script to install the `jep-cmake` in you local Python (or virtual) e
 
     > git clone https://github.com/jep-project/jep-cmake.git
     > cd jep-cmake
-    > pip install -r requirements.txt
     > pip install .
     
 After installation, the Python environment has a new command `jep-cmake`, that will run the backend.

@@ -1,1 +1,0 @@
-https://github.com/jep-project/jep-python/archive/master.zip#egg=jep_python
