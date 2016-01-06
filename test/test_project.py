@@ -22,6 +22,7 @@ def test_module_resolution():
 
     included_cmake_filepath = os.path.abspath('SomeModule.cmake')
     assert cmake_file.resolved_includes[0] is project.cmake_file_by_path[included_cmake_filepath]
+    project.shutdown_async_analysis()
 
 
 def test_recursive_command_resolution():
@@ -45,6 +46,7 @@ def test_recursive_command_resolution():
     assert ('function2', 'command-def') in commands
     assert ('func_from_included', 'SomeModule') in commands
     assert ('func_from_third', 'ThirdModule') in commands
+    project.shutdown_async_analysis()
 
 
 def test_builtin_command_resolution_none():
@@ -56,6 +58,7 @@ def test_builtin_command_resolution_none():
     assert ('add_library', 'cmake') not in commands
     assert ('ctest_configure', 'ctest') not in commands
     assert ('exec_program', 'deprecated') not in commands
+    project.shutdown_async_analysis()
 
 
 def test_builtin_command_resolution_cmake():
@@ -67,6 +70,7 @@ def test_builtin_command_resolution_cmake():
     assert ('add_library', 'cmake') in commands
     assert ('ctest_configure', 'ctest') not in commands
     assert ('exec_program', 'deprecated') not in commands
+    project.shutdown_async_analysis()
 
 
 def test_builtin_command_resolution_ctest():
@@ -78,6 +82,7 @@ def test_builtin_command_resolution_ctest():
     assert ('add_library', 'cmake') not in commands
     assert ('ctest_configure', 'ctest') in commands
     assert ('exec_program', 'deprecated') not in commands
+    project.shutdown_async_analysis()
 
 
 def test_builtin_command_resolution_deprecated():
@@ -89,3 +94,4 @@ def test_builtin_command_resolution_deprecated():
     assert ('add_library', 'cmake') not in commands
     assert ('ctest_configure', 'ctest') not in commands
     assert ('exec_program', 'deprecated') in commands
+    project.shutdown_async_analysis()

@@ -82,6 +82,14 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
             cls._async_executor = futures.ProcessPoolExecutor()
         return cls._async_executor
 
+    @classmethod
+    def shutdown_async_executor(cls, wait=True):
+        """Shuts down the executor cleanly."""
+        if cls._async_executor:
+            executor = cls._async_executor
+            cls._async_executor = None
+            executor.shutdown(wait)
+
     def analyze_async(self, cmake_file, data=None, newline_mode=NewlineMode.Unknown):
         """Calls ``analyze`` asynchronously.
 

@@ -19,11 +19,11 @@ CMAKE_LISTFILE_NAME = 'CMakeLists.txt'
 
 
 class Project:
-    def __init__(self, *, srcdir=None, cmake_version='3.4', builtin_commands=False, ctest_commands=False, deprecated_commands=False, file_analyzer_factory=None):
+    def __init__(self, *, srcdir=None, cmake_version='3.4', builtin_commands=False, ctest_commands=False, deprecated_commands=False, file_analyzer_class=None):
         #: CMake source directory of project.
         self.srcdir = srcdir or os.path.abspath('.')
         #: Factory function for cmake file parser.
-        self.file_analyzer_factory = file_analyzer_factory or FileAnalyzer
+        self.file_analyzer_class = file_analyzer_class or FileAnalyzer
 
         # lookups by filepath:
         self.cmake_file_by_path = {}
@@ -75,12 +75,16 @@ class Project:
 
         return cmake_file_future
 
+    def shutdown_async_analysis(self, wait=True):
+        """Stops running asynchronous file analysis."""
+        self.file_analyzer_class.shutdown_async_executor(wait)
+
     def _get_cmake_file(self, filepath):
         cmake_file = self.cmake_file_by_path.get(filepath)
         if cmake_file is None:
             cmake_file = CMakeFile(filepath)
             self.cmake_file_by_path[filepath] = cmake_file
-            self._analyzer_by_path[filepath] = self.file_analyzer_factory()
+            self._analyzer_by_path[filepath] = self.file_analyzer_class()
 
             # remember CMake modules:
             if fnmatch.fnmatch(filepath, CMAKE_MODULEFILE_PATTERN):
