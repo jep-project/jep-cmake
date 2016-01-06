@@ -5,7 +5,7 @@ jep-cmake
 
 JEP-based CMake support in the making.
 
-Once completed, this is a command line application implementing a JEP
+This is a command line application implementing a JEP
 backend for CMake. It enables editors that have JEP-plugin installed to
 improve their CMake editing support beyong pure syntax highlighting.
 
