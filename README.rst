@@ -102,5 +102,6 @@ specifying the corresponding command line option).
 .. |PyPI Status| image:: https://badge.fury.io/py/jep-cmake.svg
    :target: https://badge.fury.io/py/jep-cmake
 
-.. |Coveralls Status| image:: https://coveralls.io/repos/moltob/jep-cmake/badge.png?branch=master
-   :target: https://coveralls.io/r/moltob/jep-cmake?branch=master
+.. |Coveralls Status| image:: https://coveralls.io/repos/jep-project/jep-cmake/badge.svg?branch=master&service=github
+   :target: https://coveralls.io/github/jep-project/jep-cmake?branch=master
+
