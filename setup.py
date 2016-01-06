@@ -52,7 +52,17 @@ def main():
             license='',
             author='Mike Pagel',
             author_email='mike@mpagel.de',
-            description='CMake backend for JEP-enabled editors, see http://joint-editors.org/.'
+            description='CMake backend for JEP-enabled editors.',
+            keywords='jep cmake language editor',
+            classifiers=[
+                'Development Status :: 4 - Beta',
+                'Intended Audience :: End Users/Desktop',
+                'Topic :: Software Development',
+                'License :: OSI Approved :: MIT License',
+                'Programming Language :: Python :: 3.3',
+                'Programming Language :: Python :: 3.4',
+                'Programming Language :: Python :: 3.5',
+            ],
     )
 
 
