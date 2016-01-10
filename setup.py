@@ -40,8 +40,9 @@ def main():
 
     setup(
             name='jep-cmake',
-            version='0.0.1',
+            version='0.0.2',
             packages=find_packages(),
+            package_data={'jep_cmake': ['built-ins/*.txt']},
             entry_points={'console_scripts': ['jep-cmake = jep_cmake.main:main']},
             install_requires=install_requires,
             tests_require=[
