@@ -1,6 +1,8 @@
 """CMake object model."""
 import bisect
 
+import array
+
 
 class CMakeFile:
     def __init__(self, filepath: str):
@@ -11,7 +13,7 @@ class CMakeFile:
         self.includes = []
 
         #: Offsets into file's character stream, where command names begin to be possible and where not.
-        self.command_name_slots = []
+        self.command_name_slots = array.array('H')
 
         #: Resolved references to included modules.
         self.resolved_includes = []
