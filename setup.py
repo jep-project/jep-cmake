@@ -1,54 +1,35 @@
-"""Setup script for jep.python."""
+"""Setup script for jep-cmake."""
 
+# need to guard script here due to reentrance while testing multiprocessing:
+if __name__ == '__main__':
 
-def main():
-    """Wrapper around imports to prevent them being executed immediately upon this module being only imported (Sublime plugin workaround)."""
     from setuptools import setup, find_packages
-    from setuptools.command.test import test as TestCommand
     import sys
-
-    class PyTestCommand(TestCommand):
-        user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
-
-        def initialize_options(self):
-            TestCommand.initialize_options(self)
-            self.pytest_args = []
-
-        def finalize_options(self):
-            TestCommand.finalize_options(self)
-            self.test_args = []
-            self.test_suite = True
-
-        def run_tests(self):
-            #import here, cause outside the eggs aren't loaded
-            import pytest
-
-            errno = pytest.main(self.pytest_args)
-            sys.exit(errno)
-
-    # configure dependencies corresponding to interpreter version:
-    install_requires = [
-        'antlr4-python3-runtime',
-        'jep-python'
-    ]
 
     if sys.version_info < (3, 3):
         print('This Python version is not supported, minimal version 3.3 is required.')
         sys.exit(1)
-    if sys.version_info < (3, 4):
-        install_requires.append('enum34')
+
+    enum34_opt = ['enum34'] if sys.version_info < (3, 4) else []
+
+    needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
+    pytest_runner_opt = ['pytest-runner>=2.0,<3dev'] if needs_pytest else []
 
     setup(
             name='jep-cmake',
-            version='0.0.2',
+            version='0.0.3',
             packages=find_packages(),
             package_data={'jep_cmake': ['built-ins/*.txt']},
             entry_points={'console_scripts': ['jep-cmake = jep_cmake.main:main']},
-            install_requires=install_requires,
+            install_requires=[
+                                 'antlr4-python3-runtime',
+                                 'chardet',
+                                 'jep-python'
+                             ] + enum34_opt,
             tests_require=[
                 'pytest'
             ],
-            cmdclass={'test': PyTestCommand},
+            setup_requires=pytest_runner_opt,
             url='https://github.com/jep-project/jep-cmake',
             license='',
             author='Mike Pagel',
@@ -56,7 +37,7 @@ def main():
             description='CMake backend for JEP-enabled editors.',
             keywords='jep cmake language editor',
             classifiers=[
-                'Development Status :: 4 - Beta',
+                'Development Status :: 3 - Alpha',
                 'Intended Audience :: End Users/Desktop',
                 'Topic :: Software Development',
                 'License :: OSI Approved :: MIT License',
@@ -65,7 +46,3 @@ def main():
                 'Programming Language :: Python :: 3.5',
             ],
     )
-
-
-if __name__ == '__main__':
-    main()
