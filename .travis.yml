@@ -12,7 +12,7 @@ install:
   - pip install .
   - pip list
 script:
-  - python setup.py test -a "--cov=jep_cmake"
+  - python setup.py test --addopts "--cov=jep_cmake"
   - jep-cmake -h
 after_success:
   - coveralls
