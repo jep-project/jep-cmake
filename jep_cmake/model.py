@@ -13,7 +13,7 @@ class CMakeFile:
         self.includes = []
 
         #: Offsets into file's character stream, where command names begin to be possible and where not.
-        self.command_name_slots = array.array('H')
+        self.command_name_slots = array.array('L')
 
         #: Resolved references to included modules.
         self.resolved_includes = []

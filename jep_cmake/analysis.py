@@ -6,6 +6,7 @@ from concurrent import futures
 
 import antlr4
 import antlr4.error.ErrorListener
+import chardet
 
 from jep_py.content import NewlineMode
 from jep_cmake.model import FunctionDefinition, MacroDefinition, ModuleInclude
@@ -52,11 +53,24 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         cmake_file.clear()
 
         if not data:
-            # read data buffer first to use Python's universal newline, not present in ANTLR filestream:
+            # read data buffer first to use newline translation:
             _logger.debug('Parsing file {}.'.format(cmake_file.filepath))
+            open_newline_mode = NewlineMode.open_newline_mode(newline_mode)
 
-            with open(cmake_file.filepath, encoding='utf-8', newline=NewlineMode.open_newline_mode(newline_mode)) as f:
-                data = f.read()
+            try:
+                data = self._readfile(cmake_file, 'utf-8', open_newline_mode)
+            except UnicodeDecodeError:
+                _logger.debug('Triggering encoding detection of {}.'.format(cmake_file.filepath))
+
+                with open(cmake_file.filepath, 'rb') as f:
+                    data = f.read()
+                    result = chardet.detect(data)
+                    enc = result['encoding']
+                    conf = result['confidence']
+                    _logger.debug('Detected file encoding {} with confidence {:.2f}.'.format(enc, conf))
+
+                data = self._readfile(cmake_file, enc, open_newline_mode)
+
         else:
             _logger.debug('Parsing data buffer for {}.'.format(cmake_file.filepath))
 
@@ -75,6 +89,11 @@ class FileAnalyzer(cmakeListener, antlr4.error.ErrorListener.ErrorListener):
         self._cmake_file = None
 
         return cmake_file
+
+    @classmethod
+    def _readfile(cls, cmake_file, encoding, open_newline_mode):
+        with open(cmake_file.filepath, encoding=encoding, newline=open_newline_mode) as f:
+            return f.read()
 
     @classmethod
     def get_async_executor(cls):

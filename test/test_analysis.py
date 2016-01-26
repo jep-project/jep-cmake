@@ -95,3 +95,10 @@ def test_async_analysis():
     assert cmake_file.command_definitions[1].name == 'macro2'
     assert cmake_file.command_definitions[2].name == 'function1'
     assert cmake_file.command_definitions[3].name == 'function2'
+
+def test_cp1252_decoding():
+    cmf = CMakeFile('CP1252Module.cmake')
+    analyzer = FileAnalyzer()
+    f = analyzer.analyze_async(cmf)
+    cmake_file = f.result()
+    assert cmake_file

@@ -17,21 +17,28 @@ logging.config.dictConfig({
     },
     'handlers': {
         'console': {
-            'stream': sys.stdout,
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'simple',
+            'stream': sys.stdout,
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'simple',
+            'filename': 'jep-cmake.log',
+            'maxBytes': 50000,
+            'backupCount': 3,
         }
     },
     'loggers': {
         'jep_cmake': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'propagate': False,
             'level': 'DEBUG'
         },
     },
     'root': {
         'level': 'WARNING',
-        'handlers': ['console']
+        'handlers': ['console', 'file']
     }
 })
 
